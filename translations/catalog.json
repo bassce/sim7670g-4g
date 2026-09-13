@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "uiSchemaVersion": 1,
+  "fallback": "en",
+  "integrationStatus": "pending",
+  "languages": [
+    {
+      "locale": "en",
+      "name": "English",
+      "path": "en.json",
+      "bytes": 13724,
+      "sha256": "b60722e069916c92eedaba71f869d6b09d7dfaba4d1c3dc0c5264bb6e3ea3924",
+      "gzip": {
+        "path": "en.json.gz",
+        "bytes": 4245,
+        "sha256": "3a1f96973bea6816d957d9ee242d7c598e346b8879e96d3e1e3828079026b6d5"
+      }
+    },
+    {
+      "locale": "zh-CN",
+      "name": "简体中文",
+      "path": "zh-CN.json",
+      "bytes": 14089,
+      "sha256": "7fa356f6df878889b2da39d1de3cff2814db0b8ba9cbf876fb38849b012e42d9",
+      "gzip": {
+        "path": "zh-CN.json.gz",
+        "bytes": 5068,
+        "sha256": "8659e8aaa14c145086c062d5e65d9f849e45dccc02ca63bda3cea001850d1d5e"
+      }
+    }
+  ]
+}
