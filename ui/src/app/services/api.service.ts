@@ -16,6 +16,7 @@
  */
 
 import { inject, Injectable } from "@angular/core";
+import { BLEStatus, BLEDevice } from "../definitions/ble";
 import { HttpClient, HttpEvent, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from "@angular/common/http";
 import {
     Configuration,
@@ -31,6 +32,18 @@ import { catchError, distinctUntilChanged, last, map, of, Subject } from "rxjs";
 
 @Injectable()
 export class ApiService {
+    // In-memory only: retain unsaved fields across the connection page without
+    // putting WiFi/MQTT passwords into browser history or localStorage.
+    settingsDraft?: Settings;
+    bluetoothReturnUrl = "/settings";
+
+    obdStatus() { return this.$http.get<BLEStatus>("/api/obd/status"); }
+    scanBluetooth() { return this.$http.post<BLEStatus>("/api/obd/scan", {}); }
+    connectBluetooth(device: BLEDevice, protocol: string) {
+        return this.$http.post<BLEStatus>("/api/obd/connect", {}, {
+            params: {mac: device.mac, addressType: device.addressType, protocol}
+        });
+    }
 
     $http = inject(HttpClient);
 

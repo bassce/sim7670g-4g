@@ -18,6 +18,7 @@
 
 #include <WiFi.h>
 #include <atomic>
+#include <cmath>
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
@@ -38,7 +39,7 @@
 
 #include <LittleFS.h>
 
-#define FORMAT_LITTLEFS_IF_FAILED true
+#define FORMAT_LITTLEFS_IF_FAILED false
 
 #define DISCOVERED_DEVICES_FILE "/discovered_devices.json"
 
@@ -62,6 +63,8 @@
 #include "obd.h"
 #include "gsm.h"
 #include "http.h"
+#include "ble_connection.h"
+#include "RuntimeAccess.h"
 
 HTTPServer server(80);
 
@@ -112,6 +115,7 @@ std::atomic<float> gsmAccuracy{0};
 std::atomic<float> gpsLatitude{0};
 std::atomic<float> gpsLongitude{0};
 std::atomic<float> gpsAccuracy{0};
+std::atomic_bool gpsFixValid{false};
 
 std::atomic_bool clearDTC{false};
 
@@ -176,7 +180,9 @@ void WiFiAPStationConnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 
     if (wifiAPStaConnected == 1) {
         DEBUG_PORT.println("AP in use.");
+#if !defined(WS_SIM7670G_V2)
         OBD.end();
+#endif
     }
 }
 
@@ -187,9 +193,11 @@ void WiFiAPStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 
     if (wifiAPStaConnected == 0) {
         DEBUG_PORT.println("AP all clients disconnected.");
+#if !defined(WS_SIM7670G_V2)
         OBD.begin(Settings.OBD2.getName(OBD_ADP_NAME), Settings.OBD2.getMAC(), Settings.OBD2.getProtocol(),
                   Settings.OBD2.getCheckPIDSupport(), Settings.OBD2.getDebug(), Settings.OBD2.getSpecifyNumResponses());
         OBD.connect(true);
+#endif
         wifiAPInUse = false;
     }
 }
@@ -218,11 +226,38 @@ void startWiFiAP() {
 }
 
 void startHttpServer() {
+    server.on("/api/obd/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+#if defined(WS_SIM7670G_V2)
+        request->send(200, MIME_TYPE_JSON, BLEConnection::statusJSON().c_str());
+#else
+        request->send(200, MIME_TYPE_JSON, "{\"supported\":false}");
+#endif
+    });
+#if defined(WS_SIM7670G_V2)
+    server.on("/api/obd/scan", HTTP_POST, [](AsyncWebServerRequest *request) {
+        if (!BLEConnection::scan()) { request->send(409, MIME_TYPE_PLAIN, "Bluetooth is busy"); return; }
+        request->send(202, MIME_TYPE_JSON, BLEConnection::statusJSON().c_str());
+    });
+    server.on("/api/obd/connect", HTTP_POST, [](AsyncWebServerRequest *request) {
+        if (!request->hasParam("mac") || !request->hasParam("addressType") || !request->hasParam("protocol")) {
+            request->send(400, MIME_TYPE_PLAIN, "Select a scanned device and Protocol"); return;
+        }
+        const String type = request->getParam("addressType")->value();
+        const String protocol = request->getParam("protocol")->value();
+        if ((type != "0" && type != "1") || protocol.length() != 1 ||
+            !BLEConnection::connect(request->getParam("mac")->value(), type.toInt(), protocol[0])) {
+            request->send(409, MIME_TYPE_PLAIN, "Bluetooth is busy or scan selection has expired"); return;
+        }
+        request->send(202, MIME_TYPE_JSON, BLEConnection::statusJSON().c_str());
+    });
+#endif
     server.on("/api/version", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(200, MIME_TYPE_PLAIN, getVersion());
     });
 
     server.on("/api/settings", HTTP_GET, [](AsyncWebServerRequest *request) {
+        RuntimeAccess::Read access;
+        if (!access) { request->send(409, MIME_TYPE_PLAIN, "Configuration is being saved; retry shortly"); return; }
         request->send(200, MIME_TYPE_JSON, Settings.buildJson().c_str());
     });
 
@@ -235,21 +270,29 @@ void startHttpServer() {
         [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
             if (request->contentType() == MIME_TYPE_JSON) {
                 if (!index) {
-                    request->_tempObject = malloc(total);
+                    if (total == 0 || total > 16384) { request->send(413); return; }
+                    request->_tempObject = calloc(total, 1);
+                    if (!request->_tempObject) { request->send(503); return; }
                 }
 
                 if (request->_tempObject != nullptr) {
+                    if (index > total || len > total - index) { request->send(400); return; }
                     memcpy(static_cast<uint8_t *>(request->_tempObject) + index, data, len);
 
                     if (index + len == total) {
-                        auto json = std::string(static_cast<const char *>(request->_tempObject), total);
-                        if (Settings.parseJson(json)) {
-                            if (Settings.writeSettings(LittleFS)) {
-                                request->send(200);
-                            }
-                        } else {
-                            request->send(500);
+                        RuntimeAccess::Write access;
+                        if (!access) { request->send(409, MIME_TYPE_PLAIN, "Device is busy; retry saving shortly"); return; }
+#if defined(WS_SIM7670G_V2)
+                        if (BLEConnection::isBusy()) {
+                            request->send(409, MIME_TYPE_PLAIN, "Wait for Bluetooth operation to finish"); return;
                         }
+#endif
+                        auto json = std::string(static_cast<const char *>(request->_tempObject), total);
+                        auto candidate = Settings;
+                        if (!candidate.parseJson(json)) { request->send(400); return; }
+                        if (!candidate.writeSettings(LittleFS)) { request->send(500); return; }
+                        Settings = candidate;
+                        request->send(200);
                     }
                 }
             } else {
@@ -259,6 +302,8 @@ void startHttpServer() {
     );
 
     server.on("/api/states", HTTP_GET, [](AsyncWebServerRequest *request) {
+        RuntimeAccess::Read access;
+        if (!access) { request->send(409, MIME_TYPE_PLAIN, "Configuration is being saved; retry shortly"); return; }
         request->send(200, MIME_TYPE_JSON, OBD.buildJSON().c_str());
     });
 
@@ -271,21 +316,34 @@ void startHttpServer() {
         [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
             if (request->contentType() == MIME_TYPE_JSON) {
                 if (!index) {
-                    request->_tempObject = malloc(total);
+                    if (total == 0 || total > 262144) { request->send(413); return; }
+                    request->_tempObject = calloc(total, 1);
+                    if (!request->_tempObject) { request->send(503); return; }
                 }
 
                 if (request->_tempObject != nullptr) {
+                    if (index > total || len > total - index) { request->send(400); return; }
                     memcpy(static_cast<uint8_t *>(request->_tempObject) + index, data, len);
 
                     if (index + len == total) {
-                        auto json = std::string(static_cast<const char *>(request->_tempObject), total);
-                        if (OBD.parseJSON(json)) {
-                            if (OBD.writeStates(LittleFS)) {
-                                request->send(200);
-                            }
-                        } else {
-                            request->send(500);
+                        RuntimeAccess::Write access;
+                        if (!access) { request->send(409, MIME_TYPE_PLAIN, "Device is busy; retry saving shortly"); return; }
+#if defined(WS_SIM7670G_V2)
+                        if (BLEConnection::isBusy()) {
+                            request->send(409, MIME_TYPE_PLAIN, "Wait for Bluetooth operation to finish"); return;
                         }
+#endif
+                        auto json = std::string(static_cast<const char *>(request->_tempObject), total);
+                        if (OBD.hasPendingQuery()) {
+                            request->send(409, MIME_TYPE_PLAIN, "Wait for the current OBD reply to finish"); return;
+                        }
+                        auto previous = OBD.buildJSON();
+                        if (!OBD.parseJSON(json)) { request->send(400); return; }
+                        if (!OBD.writeStates(LittleFS)) {
+                            OBD.parseJSON(previous);
+                            request->send(500); return;
+                        }
+                        request->send(200);
                     }
                 }
             } else {
@@ -546,30 +604,19 @@ bool sendStaticDiagnosticDiscoveryData() {
 bool sendStates(std::vector<OBDState *> &states, bool allSendsSuccessed) {
     if (!states.empty()) {
         for (auto &state: states) {
-            const size_t len = OBD.getPayloadLength() < 64 ? 64 : OBD.getPayloadLength() + 1;
-            char tmp_char[len];
-            if (state->getLastUpdate() + state->getUpdateInterval() > millis()) {
-                continue;
-            }
-
-            if (state->valueType() == OBD_STATE_TYPE_INT) {
-                auto *is = reinterpret_cast<OBDStateInt *>(state);
-                char *str = is->formatValue();
-                strncpy(tmp_char, str, len);
-                free(str);
-            } else if (state->valueType() == OBD_STATE_TYPE_FLOAT) {
-                auto *is = reinterpret_cast<OBDStateFloat *>(state);
-                char *str = is->formatValue();
-                strncpy(tmp_char, str, len);
-                free(str);
-            } else if (state->valueType() == OBD_STATE_TYPE_BOOL) {
-                auto *is = reinterpret_cast<OBDStateBool *>(state);
-                char *str = is->formatValue();
-                strncpy(tmp_char, str, len);
-                free(str);
-            }
-
-            allSendsSuccessed |= mqtt.sendTopicUpdate(state->getName(), std::string(tmp_char));
+            // A failed/unread item must not be republished as a fresh reading.
+            if (!state->getLastUpdate() || state->getUpdateStatus() != ELM_SUCCESS) continue;
+            char* formatted = nullptr;
+            if (strcmp(state->valueType(), OBD_STATE_TYPE_INT) == 0)
+                formatted = static_cast<OBDStateInt*>(state)->formatValue();
+            else if (strcmp(state->valueType(), OBD_STATE_TYPE_FLOAT) == 0)
+                formatted = static_cast<OBDStateFloat*>(state)->formatValue();
+            else if (strcmp(state->valueType(), OBD_STATE_TYPE_BOOL) == 0)
+                formatted = static_cast<OBDStateBool*>(state)->formatValue();
+            if (!formatted) continue;
+            const std::string value(formatted);
+            free(formatted);
+            allSendsSuccessed |= mqtt.sendTopicUpdate(state->getName(), value);
         }
     } else {
         allSendsSuccessed = true;
@@ -629,12 +676,18 @@ bool sendDiagnosticData() {
 
 #if DEVICE_HAS_BATTERY
 #if DEVICE_BATTERY_VOLTAGE
-    sprintf(tmp_char, "%d", GSM::getBatteryVoltage());
-    allSendsSuccessed |= mqtt.sendTopicUpdate(HA_T_BAT_VOL, std::string(tmp_char));
+    const unsigned int batteryVoltage = GSM::getBatteryVoltage();
+    if (batteryVoltage > 0) {
+        sprintf(tmp_char, "%u", batteryVoltage);
+        allSendsSuccessed |= mqtt.sendTopicUpdate(HA_T_BAT_VOL, std::string(tmp_char));
+    }
 #endif
 #if DEVICE_BATTERY_LEVEL
-    sprintf(tmp_char, "%d", static_cast<int>(GSM::getBatteryLevel()));
-    allSendsSuccessed |= mqtt.sendTopicUpdate(HA_T_BAT_LVL, std::string(tmp_char));
+    const float batteryLevel = GSM::getBatteryLevel();
+    if (std::isfinite(batteryLevel)) {
+        sprintf(tmp_char, "%d", static_cast<int>(batteryLevel));
+        allSendsSuccessed |= mqtt.sendTopicUpdate(HA_T_BAT_LVL, std::string(tmp_char));
+    }
 #endif
 #endif
 
@@ -697,7 +750,7 @@ std::string buildLocationAttrib(const float lat, const float lon, const float ac
 
     attribs["latitude"] = lat;
     attribs["longitude"] = lon;
-    attribs["gps_accuracy"] = acc;
+    if (std::isfinite(acc)) attribs["gps_accuracy"] = acc;
 
     serializeJson(attribs, payload);
 
@@ -705,6 +758,12 @@ std::string buildLocationAttrib(const float lat, const float lon, const float ac
 }
 
 bool sendLocationData() {
+    // A missing fix is normal at startup or without satellite coverage.
+    if (!GSM::hasGSMLocation() && !(GSM::hasGPSLocation() && gpsFixValid)) {
+        DEBUG_PORT.println("Send location data...skipped (no valid fix).");
+        return true;
+    }
+
     const unsigned long start = millis();
     bool allSendsSuccessed = false;
 
@@ -717,7 +776,7 @@ bool sendLocationData() {
             true
         );
     }
-    if (GSM::hasGPSLocation()) {
+    if (GSM::hasGPSLocation() && gpsFixValid) {
         allSendsSuccessed |= mqtt.sendTopicUpdate(
             HA_T_GPS_LOC,
             buildLocationAttrib(gpsLatitude, gpsLongitude, gpsAccuracy),
@@ -776,14 +835,6 @@ void mqttSendData() {
             }
         }
 
-        if (millis() > lastMQTTLocationOutput) {
-            if (sendLocationData()) {
-                lastMQTTLocationOutput = calcTimestamp(Settings.MQTT.getLocationInterval());
-            } else {
-                return;
-            }
-        }
-
         if (millis() > lastMQTTDiagnosticOutput) {
             if (sendDiagnosticData()) {
                 lastMQTTDiagnosticOutput = calcTimestamp(Settings.MQTT.getDiagnosticInterval());
@@ -816,6 +867,13 @@ void mqttSendData() {
             const uint iv = Settings.MQTT.getDataInterval() * 5;
             lastMQTTOutput = calcTimestamp(iv < MQTT_KEEPALIVE ? iv : MQTT_KEEPALIVE - 1);
         }
+
+        // Location is optional. Neither a missing fix nor a failed publication
+        // may block diagnostics, vehicle data or the online status above.
+        if (millis() > lastMQTTLocationOutput) {
+            sendLocationData();
+            lastMQTTLocationOutput = calcTimestamp(Settings.MQTT.getLocationInterval());
+        }
     } else {
         delay(500);
     }
@@ -823,8 +881,18 @@ void mqttSendData() {
 
 [[noreturn]] void readStatesTask(void *parameters) {
     for (;;) {
+        {
+        RuntimeAccess::Read access;
+        if (!access) { delay(10); continue; }
+#if defined(WS_SIM7670G_V2)
+        if (!wifiAPInUse && clearDTC && obdConnected && !OBD.hasPendingQuery()) {
+            OBD.resetDTCs();
+            clearDTC = false;
+        }
+        BLEConnection::tick(!wifiAPInUse);
+#else
         if (!wifiAPInUse) {
-            if (clearDTC) {
+            if (clearDTC && !OBD.hasPendingQuery()) {
                 DEBUG_PORT.print("DTC reset ");
                 if (OBD.resetDTCs()) {
                     DEBUG_PORT.println("done.");
@@ -836,13 +904,39 @@ void mqttSendData() {
 
             OBD.loop();
         }
+#endif
+        }
         delay(10);
     }
+}
+
+void sendOBDConnectionStatus() {
+#if defined(WS_SIM7670G_V2)
+    static unsigned long discoveryAt = 0, statusAt = 0;
+    static std::string previous;
+    if (!mqtt.connected()) { discoveryAt = 0; statusAt = 0; return; }
+    if (!discoveryAt || static_cast<int32_t>(millis() - discoveryAt) >= 0) {
+        const bool a = mqtt.sendTopicConfig("obdConnectionState", "OBD Connection Status", "bluetooth",
+            "", "", "", EC_DIAGNOSTIC);
+        const bool b = mqtt.sendTopicConfig("obdConnected", "OBD Adapter Connected", "car-connected",
+            "", "connectivity", "", EC_DIAGNOSTIC, TT_B_SENSOR);
+        if (a && b) discoveryAt = millis() + 300000UL;
+    }
+    const std::string phase = OBD.connectionPhase.load();
+    if (phase != previous || !statusAt || static_cast<int32_t>(millis() - statusAt) >= 0) {
+        const bool a = mqtt.sendTopicUpdate("obdConnectionState", phase);
+        const bool b = mqtt.sendTopicUpdate("obdConnected", phase == "connected" ? "on" : "off");
+        if (a && b) { previous = phase; statusAt = millis() + 5000UL; }
+    }
+#endif
 }
 
 [[noreturn]] void outputTask(void *parameters) {
     unsigned long checkInterval = 0;
     for (;;) {
+        {
+        RuntimeAccess::Read access;
+        if (!access) { delay(10); continue; }
         if (!wifiAPInUse) {
 #if DEVICE_CAN_DEEP_SLEEP && DEVICE_HAS_BATTERY
             if (GSM::isBatteryUsed()) {
@@ -877,10 +971,41 @@ void mqttSendData() {
 #endif
 
             if (!gsm.checkNetwork()) {
+                gpsFixValid = false;
+                delay(250);
                 continue;
             }
 
             mqtt.loop();
+
+            if (GSM::isUseGPRS()) {
+                signalQuality = gsm.getSignalQuality();
+            }
+
+            if (!mqtt.connected()) {
+                auto client_id = String(MQTT_CLIENT_ID) + "-" + stripChars(mqtt.getIdentifier()).c_str();
+                if (!mqtt.connect(
+                    client_id.c_str(),
+                    Settings.MQTT.getHostname().c_str(),
+                    Settings.MQTT.getPort(),
+                    Settings.MQTT.getUsername().c_str(),
+                    Settings.MQTT.getPassword().c_str(),
+                    static_cast<mqttProtocol>(Settings.MQTT.getProtocol())
+                )) {
+                    gsm.checkNetwork(true);
+#if defined(WS_SIM7670G_V2)
+                    delay(10000); // Back off on broker/DNS/authentication failure.
+#endif
+                } else {
+                    lastMQTTOutput = 0; // Report immediately after connecting.
+                }
+            }
+
+            // Service HA before any potentially slow positioning query.
+            if (mqtt.connected()) {
+                mqttSendData();
+            }
+            sendOBDConnectionStatus();
 
             if ((GSM::hasGSMLocation() || GSM::hasGPSLocation()) && millis() > checkInterval) {
                 unsigned long start = millis();
@@ -904,7 +1029,10 @@ void mqttSendData() {
                     float gps_longitude = 0;
                     float gps_accuracy = 0;
 
-                    if (!(allReadSuccessed |= gsm.readGPSLocation(gps_latitude, gps_longitude, gps_accuracy))) {
+                    const bool gpsRead = gsm.readGPSLocation(gps_latitude, gps_longitude, gps_accuracy);
+                    gpsFixValid = gpsRead;
+                    allReadSuccessed |= gpsRead;
+                    if (!gpsRead) {
                         gsm.checkGPS();
                     } else {
                         gpsLatitude = gps_latitude;
@@ -916,26 +1044,13 @@ void mqttSendData() {
                 checkInterval = millis() + Settings.MQTT.getLocationInterval() * 1000L;
                 consoleSendFooter(allReadSuccessed, millis() - start);
             }
-
-            if (GSM::isUseGPRS()) {
-                signalQuality = gsm.getSignalQuality();
-            }
-
-            if (!mqtt.connected()) {
-                auto client_id = String(MQTT_CLIENT_ID) + "-" + stripChars(mqtt.getIdentifier()).c_str();
-                if (!mqtt.connect(
-                    client_id.c_str(),
-                    Settings.MQTT.getHostname().c_str(),
-                    Settings.MQTT.getPort(),
-                    Settings.MQTT.getUsername().c_str(),
-                    Settings.MQTT.getPassword().c_str(),
-                    static_cast<mqttProtocol>(Settings.MQTT.getProtocol())
-                )) {
-                    gsm.checkNetwork(true);
-                }
-            } else {
-                mqttSendData();
-            }
+#if defined(WS_SIM7670G_V2)
+        } else {
+            // Configuration pauses vehicle reads, not MQTT keepalive/status.
+            mqtt.loop();
+            sendOBDConnectionStatus();
+#endif
+        }
         }
         delay(50);
     }
@@ -967,6 +1082,11 @@ void startOutputTask(const char *id) {
 }
 
 void startReadTask() {
+#if defined(WS_SIM7670G_V2)
+    // Always create the worker, including when OBD starts disabled. The web
+    // connection page can then enable OBD without a reboot.
+    xTaskCreatePinnedToCore(readStatesTask, "OBDWorker", 12288, nullptr, 1, &stateTaskHdl, 1);
+#else
     if (!Settings.OBD2.getDisable()) {
 #ifdef USE_BLE
         OBD.onDevicesDiscovered(onBLEDevicesDiscovered);
@@ -977,15 +1097,17 @@ void startReadTask() {
 
         xTaskCreatePinnedToCore(readStatesTask, "ReadStatesTask", 9216, nullptr, 1, &stateTaskHdl, 1);
     }
+#endif
 }
 
 void setup() {
+    RuntimeAccess::Read startupAccess;
     startTime = millis();
 
     DEBUG_PORT.begin(115200);
 
     if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED)) {
-        log_d("LittleFS Mount Failed");
+        Serial.println("LittleFS mount failed; stored configuration was not formatted.");
         return;
     }
 
@@ -997,6 +1119,9 @@ void setup() {
 
     Settings.readSettings(LittleFS);
     OBD.readStates(LittleFS);
+#if defined(WS_SIM7670G_V2)
+    BLEConnection::init();
+#endif
 
     // disable Watch Dog for Core 0 - should fix crashes
     disableCore0WDT();
@@ -1007,7 +1132,10 @@ void setup() {
     // will be ignored if the device does not support
     gsm.setNetworkMode(Settings.Mobile.getNetworkMode());
     gsm.connectToNetwork();
+#if !defined(WS_SIM7670G_V2)
     gsm.enableGPS();
+#endif
+    // SIM7670G starts GNSS on its first location read, after the first HA report.
 
     OBD.onConnected(onOBDConnected);
     OBD.onConnectError(onOBDConnectError);
@@ -1015,6 +1143,9 @@ void setup() {
               Settings.OBD2.getCheckPIDSupport(), Settings.OBD2.getDebug(), Settings.OBD2.getSpecifyNumResponses());
 
     String mID = buildIdentifier(Settings.OBD2.getMAC().c_str());
+#if defined(WS_SIM7670G_V2)
+    if (mID.isEmpty()) mID = buildIdentifier(WiFi.macAddress().c_str());
+#endif
     if (!mID.isEmpty()) {
         startOutputTask(mID.c_str());
         startReadTask();

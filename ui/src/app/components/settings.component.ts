@@ -15,15 +15,13 @@
  *  59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-import { Component, inject, OnInit, ViewChild } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { ApiService } from "../services/api.service";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import {
     Configuration,
     dataIntervals,
     diagnosticIntervals,
-    DiscoveredDevice,
-    DiscoveredDevices,
     discoveryIntervals,
     locationIntervals, MQTTIdentifierType,
     MQTTProtocol,
@@ -32,19 +30,6 @@ import {
     Settings,
     stripEmptyProps
 } from "../definitions";
-import { NgbHighlight, NgbTypeahead, NgbTypeaheadSelectItemEvent } from "@ng-bootstrap/ng-bootstrap";
-import {
-    catchError,
-    debounceTime,
-    distinctUntilChanged,
-    filter,
-    map,
-    merge,
-    Observable,
-    of,
-    OperatorFunction,
-    Subject
-} from "rxjs";
 import { ToastService } from "../services/toast.service";
 import { BrowserModule, DomSanitizer } from "@angular/platform-browser";
 
@@ -75,11 +60,7 @@ export class SettingsComponent implements OnInit {
         "T-SIM7070G_BLE": [NetworkMode.AUTO, NetworkMode.GSM, NetworkMode.LTE, NetworkMode.GSM_LTE]
     };
 
-    @ViewChild("devTypeahead", {static: true}) devTypeahead: NgbTypeahead;
-
     configuration: Configuration | undefined;
-
-    discoveredDevices: DiscoveredDevices | undefined;
 
     canDeepSleep: boolean | undefined;
 
@@ -94,10 +75,6 @@ export class SettingsComponent implements OnInit {
     obd2: FormGroup;
 
     mqtt: FormGroup;
-
-    focus$ = new Subject<string>();
-
-    click$ = new Subject<string>();
 
     downloadHref: any;
 
@@ -132,6 +109,7 @@ export class SettingsComponent implements OnInit {
             password: new FormControl("", Validators.maxLength(32))
         });
         this.obd2 = new FormGroup({
+            addressType: new FormControl<number>(0),
             disable: new FormControl<boolean>(false),
             name: new FormControl("", Validators.maxLength(64)),
             mac: new FormControl("", Validators.pattern(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/)),
@@ -180,15 +158,21 @@ export class SettingsComponent implements OnInit {
     ngOnInit(): void {
         this.$api.configuration().subscribe((configuration: Configuration) => this.configuration = configuration);
         this.$api.canDeepSleep().subscribe(res => this.canDeepSleep = res.canDeepSleep);
-        this.$api.settings().subscribe(settings => this.form.patchValue(settings));
-        this.$api.discoveredDevices()
-            .pipe(catchError(() => of({} as DiscoveredDevices)))
-            .subscribe(dd => this.discoveredDevices = dd);
+        const draft = this.$api.settingsDraft;
+        this.$api.settingsDraft = undefined;
+        this.$api.settings().subscribe(settings => {
+            this.form.patchValue(settings);
+            if (draft) this.form.patchValue(draft);
+        });
     }
 
     isNetworkModeAllowed(): boolean {
         return this.configuration &&
             Object.keys(SettingsComponent.DEVICE_WITH_NETWORK_MODE).indexOf(this.configuration.deviceType) !== -1 || false;
+    }
+
+    rememberBluetoothDraft() {
+        this.$api.settingsDraft = this.form.getRawValue();
     }
 
     getNetworkModes(): Array<{ key: string, value: number }> {
@@ -227,34 +211,6 @@ export class SettingsComponent implements OnInit {
                 key: key,
                 value: MQTTProtocol[key as keyof typeof MQTTProtocol]
             }));
-    }
-
-    searchDevice: OperatorFunction<string, readonly DiscoveredDevice[]> = (text$: Observable<string>) => {
-        const debouncedText$ = text$.pipe(debounceTime(200), distinctUntilChanged());
-        const clicksWithClosedPopup$ = this.click$.pipe(filter(() => !this.devTypeahead.isPopupOpen()));
-        const inputFocus$ = this.focus$;
-
-        return merge(debouncedText$, inputFocus$, clicksWithClosedPopup$).pipe(
-            map((term) =>
-                (
-                    (term === "" ?
-                            this.discoveredDevices?.device :
-                            (this.discoveredDevices?.device || [])
-                                .filter((v) =>
-                                    v.name.toLowerCase().indexOf(term.toLowerCase()) > -1 ||
-                                    v.mac.toLowerCase().indexOf(term.toLowerCase()) > -1
-                                )
-                    ) || []
-                ).slice(0, 10)
-            )
-        );
-    }
-
-    onSelectDevice(event: NgbTypeaheadSelectItemEvent) {
-        event.preventDefault();
-        if (event.item) {
-            this.obd2.patchValue({"name": event.item.name, "mac": event.item.mac});
-        }
     }
 
     generateDownload() {

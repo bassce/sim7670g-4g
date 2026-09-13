@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "templates": [
+    {
+      "id": "generic-petrol-basic",
+      "path": "templates/generic-petrol-basic.json",
+      "sha256": "ff7db64957ce8c59819d9a11a16239c0a9ed1e46189440f03146a1e0bf515334",
+      "importPath": "import/generic-petrol-basic.en.json"
+    },
+    {
+      "id": "vw-id4-basic",
+      "path": "templates/vw-id4-basic.json",
+      "sha256": "82e2340724c03c12da924a1f061b03c13070ef1f55a6731456bd215f610c070c",
+      "importPath": "import/vw-id4-basic.en.json"
+    }
+  ]
+}

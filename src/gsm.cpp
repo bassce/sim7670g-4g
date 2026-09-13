@@ -17,6 +17,7 @@
 #include "gsm.h"
 
 #include <settings.h>
+#include <cmath>
 
 #if defined(SIM800L_IP5306_VERSION_20190610) or defined(SIM800L_AXP192_VERSION_20200327) or defined(SIM800C_AXP192_VERSION_20200609) or defined(SIM800L_IP5306_VERSION_20200811)
 #include "device_sim800.h"
@@ -211,7 +212,8 @@ GSM::GSM(Stream &stream) : stream(stream), modem(TinyGsm(stream)) {
 Client *GSM::getClient(const bool useSecure) {
     if (useSecure) {
         if (client != nullptr) {
-            free(client);
+            delete client;
+            client = nullptr;
         }
         if (secureClient == nullptr) {
 #if defined(SIM800L_IP5306_VERSION_20190610) or defined(SIM800L_AXP192_VERSION_20200327) or defined(SIM800C_AXP192_VERSION_20200609) or defined(SIM800L_IP5306_VERSION_20200811)
@@ -224,7 +226,8 @@ Client *GSM::getClient(const bool useSecure) {
     }
 
     if (secureClient != nullptr) {
-        free(secureClient);
+        delete secureClient;
+        secureClient = nullptr;
     }
     if (client == nullptr) {
         client = new TinyGsmClient(modem);
@@ -233,6 +236,9 @@ Client *GSM::getClient(const bool useSecure) {
 }
 
 void GSM::resetModem() {
+#if defined(WS_SIM7670G_V2)
+    initSIM7670G(true);
+#else
 #if defined(SIM800L_IP5306_VERSION_20190610) or defined(SIM800L_AXP192_VERSION_20200327) or defined(SIM800C_AXP192_VERSION_20200609) or defined(SIM800L_IP5306_VERSION_20200811)
     digitalWrite(MODEM_POWER_ON, LOW);
     delay(1000);
@@ -267,6 +273,7 @@ void GSM::resetModem() {
         }
     }
     Serial.println("...success");
+#endif
 }
 
 std::string GSM::getIpAddress() {
@@ -286,6 +293,18 @@ void GSM::setNetworkMode(int mode) {
 }
 
 void GSM::connectToNetwork() {
+#if defined(WS_SIM7670G_V2)
+    Serial.printf("WS-SIM7670G-V2: Flash=%u MB, PSRAM=%u MB, TX=18 RX=17 POWER=21\n",
+                  ESP.getFlashChipSize() / (1024 * 1024), ESP.getPsramSize() / (1024 * 1024));
+    digitalWrite(BOARD_POWERON_PIN, HIGH);
+    pinMode(BOARD_POWERON_PIN, OUTPUT);
+    digitalWrite(MODEM_DTR_PIN, LOW);
+    pinMode(MODEM_DTR_PIN, OUTPUT);
+    pinMode(MODEM_RING_PIN, INPUT);
+    SerialAT.begin(MODEM_BAUDRATE, SERIAL_8N1, MODEM_RX_PIN, MODEM_TX_PIN);
+    SerialAT.setTimeout(1000);
+    checkSIM7670GNetwork();
+#else
     Serial.println("Start modem...");
 
 #if defined(SIM800L_IP5306_VERSION_20190610) or defined(SIM800L_AXP192_VERSION_20200327) or defined(SIM800C_AXP192_VERSION_20200609) or defined(SIM800L_IP5306_VERSION_20200811)
@@ -411,18 +430,31 @@ restart:
         // currently not enough space for that
         // updateLocaleTime();
     }
+#endif
 }
 
 void GSM::powerOff() {
+#if defined(WS_SIM7670G_V2)
+    modem.sendAT("+CPOF");
+    modem.waitResponse(5000L);
+    delay(3000);
+    digitalWrite(BOARD_POWERON_PIN, LOW);
+    modemReady = gpsReady = dataConnected = false;
+    ipAddress.clear();
+#else
     modem.poweroff();
 
     // check if not response
     while (modem.testAT()) {
         delay(500);
     }
+#endif
 }
 
 bool GSM::checkNetwork(bool resetConnection) {
+#if defined(WS_SIM7670G_V2)
+    return checkSIM7670GNetwork();
+#else
     // Make sure we're still registered on the network
     if (!modem.isNetworkConnected() || resetConnection) {
         Serial.println("Network disconnected");
@@ -484,6 +516,7 @@ bool GSM::checkNetwork(bool resetConnection) {
         }
     }
     return true;
+#endif
 }
 
 bool GSM::isNetworkConnected() {
@@ -527,7 +560,7 @@ short int GSM::getSignalQuality() {
 }
 
 bool GSM::hasGSMLocation() {
-#if defined TINY_GSM_MODEM_HAS_GSM_LOCATION
+#if defined(TINY_GSM_MODEM_HAS_GSM_LOCATION) && !defined(WS_SIM7670G_V2)
     return true;
 #else
     return false;
@@ -543,6 +576,9 @@ bool GSM::hasGPSLocation() {
 }
 
 void GSM::enableGPS() {
+#if defined(WS_SIM7670G_V2)
+    enableSIM7670GGPS();
+#else
 #if defined TINY_GSM_MODEM_HAS_GPS
 #if !defined(TINY_GSM_MODEM_SARAR5) // not needed for this module
     Serial.print("Enabling GPS/GNSS/GLONASS...");
@@ -556,9 +592,13 @@ void GSM::enableGPS() {
 #elif defined LILYGO_GPS_SHIELD
     SerialGPS.begin(9600, SERIAL_8N1, BOARD_GPS_RX_PIN, BOARD_GPS_TX_PIN);
 #endif
+#endif
 }
 
 bool GSM::checkGPS() {
+#if defined(WS_SIM7670G_V2)
+    return enableSIM7670GGPS();
+#else
 #if defined TINY_GSM_MODEM_HAS_GPS
     if (!modem.isEnableGPS()) {
         Serial.println("GPS/GNSS/GLONASS disabled");
@@ -571,10 +611,14 @@ bool GSM::checkGPS() {
     }
 #endif
     return true;
+#endif
 }
 
 bool GSM::readGSMLocation(float &gsmLatitude, float &gsmLongitude, float &gsmAccuracy) {
-#if defined TINY_GSM_MODEM_HAS_GSM_LOCATION
+#if defined(WS_SIM7670G_V2)
+    // TinyGSM SIM7672 declares the GSM-location mixin but has no implementation.
+    return false;
+#elif defined(TINY_GSM_MODEM_HAS_GSM_LOCATION)
     float gsm_latitude = 0;
     float gsm_longitude = 0;
     float gsm_accuracy = 0;
@@ -596,6 +640,9 @@ bool GSM::readGSMLocation(float &gsmLatitude, float &gsmLongitude, float &gsmAcc
 }
 
 bool GSM::readGPSLocation(float &gpsLatitude, float &gpsLongitude, float &gpsAccuracy) {
+#if defined(WS_SIM7670G_V2)
+    return readSIM7670GGPS(gpsLatitude, gpsLongitude, gpsAccuracy);
+#else
 #if defined TINY_GSM_MODEM_HAS_GPS
     uint8_t status = 0;
     float gps_latitude = 0;
@@ -629,6 +676,7 @@ bool GSM::readGPSLocation(float &gpsLatitude, float &gpsLongitude, float &gpsAcc
     }
 #endif
     return true;
+#endif
 }
 
 void GSM::initBattery() {
@@ -668,9 +716,8 @@ unsigned int GSM::getBatteryVoltage() {
 #elif defined(MAX17048_I2C_ADDRESS)
     Wire.beginTransmission(MAX17048_I2C_ADDRESS);
     Wire.write(0x02);
-    Wire.endTransmission();
-
-    Wire.requestFrom(MAX17048_I2C_ADDRESS, 2);
+    if (Wire.endTransmission(false) != 0) return 0;
+    if (Wire.requestFrom(MAX17048_I2C_ADDRESS, 2) != 2) return 0;
     uint16_t result = ((uint16_t) Wire.read() << 8) | Wire.read();
 
     return static_cast<int>(1.0f * result * 78.125f / 1000.0f);
@@ -683,9 +730,8 @@ float GSM::getBatteryLevel() {
 #if defined(MAX17048_I2C_ADDRESS)
     Wire.beginTransmission(MAX17048_I2C_ADDRESS);
     Wire.write(0x04);
-    Wire.endTransmission();
-
-    Wire.requestFrom(MAX17048_I2C_ADDRESS, 2);
+    if (Wire.endTransmission(false) != 0) return NAN;
+    if (Wire.requestFrom(MAX17048_I2C_ADDRESS, 2) != 2) return NAN;
     uint16_t result = ((uint16_t) Wire.read() << 8) | Wire.read();
     if (result > 25600) result = 25600;
 

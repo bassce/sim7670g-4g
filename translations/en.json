@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "locale": "en",
+  "status": "seed",
+  "messages": {
+    "common.save": "Save",
+    "common.cancel": "Cancel",
+    "settings.language": "Language",
+    "templates.title": "Vehicle templates"
+  }
+}

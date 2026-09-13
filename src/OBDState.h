@@ -40,6 +40,8 @@ namespace obd {
     } OBDResponseFormat;
 }
 
+#include <atomic>
+
 class OBDState {
 protected:
     ELM327 *elm327 = nullptr;
@@ -57,6 +59,9 @@ protected:
     uint8_t service = 0;
     uint16_t pid = 0;
     uint32_t header = 0;
+    ELMQueryConfig queryConfig;
+    uint8_t dataOffset = 0, dataLength = 0;
+    bool signedValue = false;
     uint8_t numResponses = 0;
     uint8_t numExpectedBytes = 0;
     obd::OBDResponseFormat responseFormat;
@@ -66,21 +71,22 @@ protected:
 
     char calcExpression[257] = "\0";
 
-    bool init = false;
+    std::atomic_bool init{false};
     bool checkPidSupport = false;
     bool setHeader = false;
-    bool supported = true;
+    std::atomic_bool supported{true};
     bool enabled = true;
     bool visible = true;
-    bool processing = false;
+    std::atomic_bool processing{false};
 
     long updateInterval = 1000;
 
-    long previousUpdate = 0;
+    std::atomic<long> previousUpdate{0};
 
-    long lastUpdate = 0;
+    std::atomic<long> lastUpdate{0};
+    std::atomic<uint32_t> lastAttempt{0};
 
-    int8_t updateStatus = 0;
+    std::atomic<int8_t> updateStatus{0};
 
     char *payload = nullptr;
 
@@ -96,7 +102,7 @@ public:
     OBDState(obd::OBDStateType type, const char *name, const char *description, const char *icon,
              const char *unit = "", const char *deviceClass = "", bool measurement = true, bool diagnostic = false);
 
-    ~OBDState();
+    virtual ~OBDState();
 
     obd::OBDStateType getType() const;
 
@@ -152,6 +158,11 @@ public:
                                       const char *scaleFactorExpression = nullptr,
                                       const float &bias = 0);
 
+    void setQueryConfig(const ELMQueryConfig& config) { queryConfig = config; }
+    void setDataField(uint8_t offset, uint8_t length, bool signedField) {
+        dataOffset = offset; dataLength = length; signedValue = signedField;
+    }
+
     bool isInit() const;
 
     void setCheckPidSupport(bool enable);
@@ -181,6 +192,8 @@ public:
     long getPreviousUpdate() const;
 
     long getLastUpdate() const;
+    uint32_t getLastAttempt() const { return lastAttempt.load(); }
+    int8_t getUpdateStatus() const { return updateStatus.load(); }
 
     virtual void readValue();
 
@@ -197,9 +210,9 @@ public:
 template<typename T>
 class TypedOBDState : public OBDState {
 protected:
-    T oldValue;
+    std::atomic<T> oldValue{T{}};
 
-    T value;
+    std::atomic<T> value{T{}};
 
     char readFunctionName[33] = "\0";
 

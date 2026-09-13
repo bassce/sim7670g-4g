@@ -18,6 +18,9 @@
 #include "OBDState.h"
 
 #include <ExprParser.h>
+#include <BLETrace.h>
+#include <cmath>
+#include <limits>
 
 #include "obd.h"
 
@@ -122,15 +125,19 @@ double OBDState::conditionResponse(const double &value, const obd::OBDResponseFo
 }
 
 uint32_t OBDState::supportedPIDs(const uint8_t &service, const uint16_t &pid) const {
-    const uint8_t pidInterval = (pid / PID_INTERVAL_OFFSET) * PID_INTERVAL_OFFSET;
+    // The bitmap at 00 describes 01..20, at 20 describes 21..40, etc.
+    const uint8_t pidInterval = pid == 0 ? 0 : ((pid - 1) / PID_INTERVAL_OFFSET) * PID_INTERVAL_OFFSET;
     return static_cast<uint32_t>(elm327->processPID(service, pidInterval, 1, 4));
 }
 
 bool OBDState::isPIDSupported(const uint8_t &service, const uint16_t &pid) const {
-    if (service >= 0x01 && service <= 0x0A) {
+    // This bitmap scheme applies to live-data service 01. Other services,
+    // extended DIDs and controller-specific requests need their own discovery.
+    if (service == 0x01 && pid > 0 && pid <= 0xFF && header == 0 && queryConfig.empty()) {
         const uint32_t response = supportedPIDs(service, pid);
         if (elm327->nb_rx_state == ELM_SUCCESS) {
-            return ((response >> (32 - pid)) & 0x1);
+            const unsigned bit = 31 - ((pid - 1) % PID_INTERVAL_OFFSET);
+            return ((response >> bit) & 0x1) != 0;
         }
 
         return false;
@@ -172,7 +179,7 @@ void OBDState::setPIDSettings(const uint8_t &service, const uint16_t &pid, const
             Serial.println(parser.errormsg);
         }
     }
-    strlcpy(this->scaleFactorExpression, scaleFactorExpression, sizeof(this->scaleFactorExpression));
+    strlcpy(this->scaleFactorExpression, scaleFactorExpression ? scaleFactorExpression : "", sizeof(this->scaleFactorExpression));
 
     this->setPIDSettings(service, pid, header, numResponses, numExpectedBytes, responseFormat, scaleFactor, bias);
 }
@@ -199,6 +206,15 @@ bool OBDState::isInit() const {
 
 void OBDState::setCheckPidSupport(const bool enable) {
     this->checkPidSupport = enable;
+    // Called on each connection as well as configuration changes. Do not carry
+    // an unfinished request or another vehicle's support result into a session.
+    init = false;
+    supported = true;
+    processing = false;
+    setHeader = false;
+    lastUpdate = 0;
+    previousUpdate = 0;
+    lastAttempt = 0;
 }
 
 bool OBDState::isSupported() const {
@@ -292,13 +308,11 @@ void OBDState::toJSON(JsonDocument &doc) {
 }
 
 void OBDState::setPayload(const char *payload) {
-    size_t len = strlen(payload) + 1;
-    if (!payload) {
-        this->payload = (char *) heap_caps_malloc(len, MALLOC_CAP_SPIRAM);
-    } else {
-        this->payload = (char *) heap_caps_realloc(this->payload, len, MALLOC_CAP_SPIRAM);
-    }
-
+    if (!payload || payload == this->payload) return;
+    const size_t len = strlen(payload) + 1;
+    auto* resized = static_cast<char*>(heap_caps_realloc(this->payload, len, MALLOC_CAP_SPIRAM));
+    if (!resized) return; // Keep the previous valid allocation on failure.
+    this->payload = resized;
     strlcpy(this->payload, payload, len);
 }
 
@@ -400,83 +414,70 @@ TypedOBDState<T> *TypedOBDState<T>::withReadFunc(const std::function<T()> &func)
 
 template<typename T>
 void TypedOBDState<T>::readValue() {
-    if (elm327 != nullptr && elm327->elm_port && this->type == obd::READ) {
-        if (!this->init && this->readFunction == nullptr) {
-            this->supported = this->checkPidSupport && isPIDSupported(this->service, this->pid) || true;
-            this->init = this->checkPidSupport && elm327->nb_rx_state == ELM_SUCCESS || true;
-        } else if (this->readFunction != nullptr) {
-            this->init = true;
-        }
-
-        if (this->init && this->supported) {
-            if (!this->processing) {
-                if (this->header > 0 && !this->setHeader) {
-                    this->setHeader = false;
-                    char command[20] = {'\0'};
-                    char h[10] = {'\0'};
-                    snprintf(h, sizeof(h), "%X", header);
-                    snprintf(command, sizeof(command), SET_HEADER, h);
-                    if (elm327->sendCommand_Blocking(command) == ELM_SUCCESS) {
-                        if (strstr(elm327->payload, RESPONSE_OK) != nullptr) {
-                            this->setHeader = true;
-                        }
-                    }
-                }
-
-                this->oldValue = this->value;
-                this->previousUpdate = this->lastUpdate;
-                this->processing = true;
-            }
-
-            T value = static_cast<T>(this->readFunction != nullptr
-                                         ? this->readFunction()
-                                         : this->responseFormat == obd::PREDEFINED
-                                               ? elm327->processPID(this->service, this->pid, this->numResponses,
-                                                                    this->numExpectedBytes,
-                                                                    this->scaleFactor, this->bias)
-                                               : conditionResponse(
-                                                   elm327->processPID(
-                                                       this->service,
-                                                       this->pid,
-                                                       this->numResponses,
-                                                       this->numExpectedBytes,
-                                                       1,
-                                                       0
-                                                   ),
-                                                   this->responseFormat, this->scaleFactor, this->bias
-                                               )
-            );
-
-            if (elm327->nb_rx_state == ELM_SUCCESS) {
-                this->setPayload(elm327->payload);
-                this->value = value;
-
-                if (this->postProcessFunction != nullptr) {
-                    this->postProcessFunction(this);
-                }
-
-                this->lastUpdate = millis();
-                this->processing = false;
-                this->updateStatus = elm327->nb_rx_state;
-            } else if (elm327->nb_rx_state == ELM_NO_DATA) {
-                this->value = 0;
-                this->lastUpdate = millis();
-                this->processing = false;
-                this->updateStatus = elm327->nb_rx_state;
-            } else if (elm327->nb_rx_state != ELM_GETTING_MSG) {
-                this->processing = false;
-                this->updateStatus = elm327->nb_rx_state;
-            }
-
-            if (this->header > 0 && this->setHeader && !this->processing) {
-                if (elm327->sendCommand_Blocking(SET_ALL_TO_DEFAULTS) == ELM_SUCCESS) {
-                    if (strstr(elm327->payload, RESPONSE_OK) != nullptr) {
-                        this->setHeader = false;
-                    }
-                }
-            }
-        }
+    if (!elm327 || !elm327->elm_port || this->type != obd::READ) return;
+    if (!this->processing && !elm327->prepareHeader(0)) {
+        this->updateStatus = ELM_GENERAL_ERROR; this->lastAttempt = millis(); return;
     }
+    if (!this->init) {
+        if (!this->readFunction && this->checkPidSupport && this->service == 1 && this->pid > 0 && this->pid <= 0xFF && !this->header && this->queryConfig.empty()) {
+            const bool result = isPIDSupported(this->service, this->pid);
+            if (elm327->nb_rx_state == ELM_GETTING_MSG) { this->processing = true; return; }
+            this->processing = false;
+            if (elm327->nb_rx_state != ELM_SUCCESS) {
+                this->updateStatus = elm327->nb_rx_state; this->lastAttempt = millis();
+                BT_TRACE("PID_SUPPORT", "name=%s status=%d nrc=%02X retry=1", this->name, elm327->nb_rx_state, elm327->lastNRC);
+                return;
+            }
+            this->supported = result;
+            BT_TRACE("PID_SUPPORT", "name=%s supported=%u", this->name, result ? 1U : 0U);
+        } else this->supported = true;
+        this->init = true;
+    }
+    if (!this->supported) return;
+    if (!this->processing) {
+        if (!elm327->prepareQuery(this->header, this->queryConfig)) {
+            // Best-effort rollback now; a failed rollback remains dirty and
+            // blocks the next vehicle query until recovery succeeds.
+            elm327->restoreHeader();
+            this->updateStatus = ELM_GENERAL_ERROR; this->lastAttempt = millis(); return;
+        }
+        this->oldValue = this->getValue();
+        this->previousUpdate = this->getLastUpdate();
+        this->processing = true;
+    }
+    double raw = this->readFunction ? double(this->readFunction()) :
+        this->responseFormat == obd::PREDEFINED || this->dataLength || this->dataOffset || this->signedValue ?
+            elm327->processPID(this->service, this->pid, this->numResponses, this->numExpectedBytes,
+                this->scaleFactor, this->bias, this->dataOffset, this->dataLength, this->signedValue) :
+            conditionResponse(elm327->processPID(this->service, this->pid, this->numResponses, this->numExpectedBytes, 1, 0),
+                this->responseFormat, this->scaleFactor, this->bias);
+    if (elm327->nb_rx_state == ELM_GETTING_MSG) return;
+    int8_t status = elm327->nb_rx_state;
+    const unsigned nrc = elm327->lastNRC;
+    const unsigned parseError = unsigned(elm327->responseError);
+    // A 32-bit diagnostic bitmap is stored in the signed int container but
+    // formatted as bits. Preserve its upper bit without an out-of-range cast.
+    if (status == ELM_SUCCESS && std::is_same<T, int>::value &&
+        strcmp(this->valueFormatFunctionName, "toBitStr") == 0 &&
+        raw >= 2147483648.0 && raw <= 4294967295.0 && std::floor(raw) == raw)
+        raw -= 4294967296.0;
+    if (status == ELM_SUCCESS && (!std::isfinite(raw) ||
+        (!std::is_same<T, bool>::value && (raw < std::numeric_limits<T>::lowest() || raw > std::numeric_limits<T>::max()))))
+        status = ELM_GENERAL_ERROR;
+    if (status == ELM_SUCCESS) this->setPayload(elm327->payload);
+    if (!elm327->restoreHeader()) status = ELM_GENERAL_ERROR;
+    if (status == ELM_SUCCESS) {
+        this->value = static_cast<T>(raw);
+        this->lastUpdate = millis();
+        if (this->postProcessFunction) this->postProcessFunction(this);
+    }
+    // Errors and NO DATA leave the last valid reading intact. lastAttempt
+    // advances independently so a failed item cannot starve the entire queue.
+    this->updateStatus = status;
+    this->processing = false;
+    this->lastAttempt = millis();
+    BT_TRACE("OBD_RESULT", "name=%s service=%02X pid=%04X status=%d nrc=%02X parse=%u", this->name,
+        this->service, this->pid, int(status), nrc, parseError);
 }
 
 template<typename T>
@@ -490,15 +491,23 @@ void TypedOBDState<T>::calcValue(const std::function<double(const char *)> &func
                                  const std::map<const char *, const std::function<double(double)>> &funcs) {
     if (this->type == obd::CALC && strlen(this->calcExpression) != 0) {
         if (!this->processing) {
-            this->oldValue = this->value;
-            this->previousUpdate = this->lastUpdate;
+            this->oldValue = this->getValue();
+            this->previousUpdate = this->getLastUpdate();
             this->processing = true;
         }
 
         ExprParser parser;
         parser.setCustomFunctions(funcs);
         parser.setVariableResolveFunction(func);
-        this->value = static_cast<T>(parser.evalExp(const_cast<char *>(this->calcExpression)));
+        const double calculated = parser.evalExp(const_cast<char *>(this->calcExpression));
+        this->lastAttempt = millis();
+        if (!std::isfinite(calculated) || (!std::is_same<T, bool>::value &&
+            (calculated < std::numeric_limits<T>::lowest() || calculated > std::numeric_limits<T>::max()))) {
+            this->processing = false; this->updateStatus = ELM_GENERAL_ERROR; return;
+        }
+        if (parser.errormsg[0]) { this->processing = false; this->updateStatus = ELM_GENERAL_ERROR; return; }
+        this->value = static_cast<T>(calculated);
+        this->updateStatus = ELM_SUCCESS;
         if (strlen(parser.errormsg) > 0) {
             Serial.println();
             Serial.print(this->name);
@@ -591,7 +600,9 @@ char *TypedOBDState<T>::formatValue() {
             return 0.0;
         });
         double val = parser.evalExp(const_cast<char *>(this->valueFormatExpression));
-        snprintf(str, len, this->valueFormat, static_cast<T>(!isinf(val) ? val : 0));
+        if (!std::isfinite(val) || parser.errormsg[0] || (!std::is_same<T, bool>::value &&
+            (val < std::numeric_limits<T>::lowest() || val > std::numeric_limits<T>::max()))) return nullptr;
+        snprintf(str, len, this->valueFormat, static_cast<T>(val));
     } else {
         snprintf(str, len, this->valueFormat, this->getValue());
     }
@@ -610,12 +621,19 @@ void TypedOBDState<T>::toJSON(JsonDocument &doc) {
             doc["pid"]["service"] = this->service;
             doc["pid"]["pid"] = this->pid;
             doc["pid"]["header"] = this->header;
+            doc["pid"]["protocol"] = this->queryConfig.protocol;
+            doc["pid"]["receiveHeader"] = this->queryConfig.receiveHeader;
+            doc["pid"]["flowControlHeader"] = this->queryConfig.flowControlHeader;
+            doc["pid"]["flowControlData"] = this->queryConfig.flowControlData;
+            doc["pid"]["dataOffset"] = this->dataOffset;
+            doc["pid"]["dataLength"] = this->dataLength;
+            doc["pid"]["signedValue"] = this->signedValue;
             doc["pid"]["numResponses"] = this->numResponses;
             doc["pid"]["numExpectedBytes"] = this->numExpectedBytes;
             doc["pid"]["responseFormat"] = this->responseFormat;
-            if (this->scaleFactorExpression != nullptr) {
+            if (this->scaleFactorExpression[0]) {
                 doc["pid"]["scaleFactor"] = this->scaleFactorExpression;
-            }
+            } else doc["pid"]["scaleFactor"] = this->scaleFactor;
             if (this->bias != 0) {
                 doc["pid"]["bias"] = this->bias;
             }

@@ -16,6 +16,8 @@
  */
 
 import { BrowserModule } from "@angular/platform-browser";
+import { BluetoothComponent } from "./components/bluetooth.component";
+import { OBDConnectionStatusComponent } from "./components/obdConnectionStatus.component";
 import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 
@@ -42,6 +44,8 @@ import { NgbHighlight, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
         SettingsComponent,
     ],
     imports: [
+        BluetoothComponent,
+        OBDConnectionStatusComponent,
         BrowserModule,
         ReactiveFormsModule,
         NgbHighlight,
@@ -50,6 +54,7 @@ import { NgbHighlight, NgbTypeahead } from "@ng-bootstrap/ng-bootstrap";
             [
                 {path: "", component: DeviceInfoComponent},
                 {path: "settings", component: SettingsComponent},
+                {path: "bluetooth", component: BluetoothComponent},
                 {path: "states", component: OBDStatesComponent},
                 {path: "ota", component: OTAComponent},
             ],

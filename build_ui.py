@@ -16,12 +16,18 @@ import os
 import os.path
 import platform
 import re
+import shutil
+import sys
 from subprocess import run, CalledProcessError
 
 Import("env")
+from SCons.Script import COMMAND_LINE_TARGETS
 
 # Install custom packages from the PyPi registry
-env.Execute("$PYTHONEXE -m pip install intelhex")
+try:
+    import intelhex
+except ImportError:
+    run([sys.executable, "-m", "pip", "install", "intelhex"], check=True)
 
 def writeUIConfiguration(env):
     confJson = "./data/public/configuration.json"
@@ -33,23 +39,19 @@ def writeUIConfiguration(env):
 
 
 def isTool(name):
-    cmd = "where" if platform.system() == "Windows" else "which"
-    try:
-        run([cmd, name])
-        return True
-    except:
-        return False;
+    return shutil.which(name) is not None
 
 
 def buildUI():
     if isTool("npm"):
         print("Attempting to build UI...")
+        install_command = "ci" if os.path.isfile("package-lock.json") else "install"
         try:
             if platform.system() == "Windows":
-                print(run(["npm.cmd", "install"], check=True, capture_output=False, text=True).stdout)
+                print(run(["npm.cmd", install_command], check=True, capture_output=False, text=True).stdout)
                 print(run(["npm.cmd", "run", "build"], check=True, capture_output=False, text=True).stdout)
             else:
-                print(run(["npm", "install"], check=True, capture_output=False, text=True).stdout)
+                print(run(["npm", install_command], check=True, capture_output=False, text=True).stdout)
                 print(run(["npm", "run", "build"], check=True, capture_output=False, text=True).stdout)
         except OSError as e:
             print("Encountered error OSError building UI:", e)
@@ -77,9 +79,15 @@ def removeUIFiles(public_path):
 
 
 def fsBuild(source, target, env):
-    buildUI()
+    if os.getenv("OBD2_MQTT_PREBUILT_UI") != "1":
+        buildUI()
+    if not os.path.isfile("./data/public/index.html"):
+        raise RuntimeError("UI build failed and no prebuilt index.html exists")
     removeUIFiles("./data/public/")
     writeUIConfiguration(env)
 
 
-env.AddPreAction("$BUILD_DIR/littlefs.bin", fsBuild);
+# Run before the platform filesystem builder enumerates data/. A pre-action on
+# a guessed image node can miss the Windows builder's actual target node.
+if {"buildfs", "uploadfs", "uploadfsota"}.intersection(COMMAND_LINE_TARGETS):
+    fsBuild(None, None, env)

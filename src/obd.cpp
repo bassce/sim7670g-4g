@@ -16,6 +16,8 @@
  */
 
 #include "obd.h"
+#include "QueryConfigJson.h"
+#include "AtomicJsonFile.h"
 
 #include <OBDStates.h>
 #include <ExprParser.h>
@@ -155,7 +157,7 @@ OBDClass::OBDClass() : OBDStates(&elm327), elm327() {
 bool OBDClass::parseJSON(std::string &json) {
     bool success = false;
     JsonDocument doc;
-    if (!deserializeJson(doc, json)) {
+    if (!deserializeJson(doc, json) && QueryConfigJson::validStates(doc.as<JsonVariantConst>())) {
         readJSON(doc);
         success = true;
     }
@@ -182,6 +184,14 @@ void OBDClass::fromJSON(T *state, JsonDocument &doc) {
                 !doc["pid"]["scaleFactor"].isNull() ? doc["pid"]["scaleFactor"].as<std::string>().c_str() : "1",
                 doc["pid"]["bias"].as<float>()
             );
+            ELMQueryConfig config;
+            config.protocol = doc["pid"]["protocol"] | uint8_t(0);
+            config.receiveHeader = doc["pid"]["receiveHeader"] | uint32_t(0);
+            config.flowControlHeader = doc["pid"]["flowControlHeader"] | uint32_t(0);
+            config.flowControlData = doc["pid"]["flowControlData"] | uint32_t(0x300000);
+            state->setQueryConfig(config);
+            state->setDataField(doc["pid"]["dataOffset"] | uint8_t(0),
+                doc["pid"]["dataLength"] | uint8_t(0), doc["pid"]["signedValue"] | false);
         }
     } else if (state->getType() == obd::CALC) {
         if (!doc["expr"].isNull()) {
@@ -208,7 +218,7 @@ bool OBDClass::readStates(FS &fs) {
     File file = fs.open(STATES_FILE, FILE_READ);
     if (file && !file.isDirectory()) {
         JsonDocument doc;
-        if (!deserializeJson(doc, file)) {
+        if (!deserializeJson(doc, file) && QueryConfigJson::validStates(doc.as<JsonVariantConst>())) {
             readJSON(doc);
             success = true;
         }
@@ -288,21 +298,9 @@ void OBDClass::writeJSON(JsonDocument &doc) {
 }
 
 bool OBDClass::writeStates(FS &fs) {
-    bool success = false;
-
-    File file = fs.open(STATES_FILE, FILE_WRITE);
-    if (!file) {
-        Serial.println("Failed to open file settings.json for writing.");
-        return false;
-    }
-
     JsonDocument doc;
     writeJSON(doc);
-    success = serializeJson(doc, file);
-
-    file.close();
-
-    return success;
+    return writeJsonAtomic(fs, STATES_FILE, doc);
 }
 
 template<typename T>
@@ -446,14 +444,90 @@ BTScanResults *OBDClass::discoverBtDevices() {
 
 #ifdef USE_BLE
 void OBDClass::onBLEDisconnect() {
+#if defined(WS_SIM7670G_V2)
+    if (!OBD.stopConnect) {
+        OBD.bleDisconnectReason = OBD.serialBLE.getLastDisconnectReason();
+        OBD.connectionError = "link_disconnected";
+        OBD.connectionPhase = "disconnected";
+        OBD.initDone = false;
+        Serial.printf("[OBD] link disconnected reason=%d\n", OBD.bleDisconnectReason.load());
+        if (OBD.connectErrorCallback) OBD.connectErrorCallback();
+    }
+#else
     Serial.println("Bluetooth LE disconnected.");
-
     if (OBD.initDone && !OBD.stopConnect) {
         // FIXME get reconnect working
         // OBD.connect(true);
         ESP.restart();
     }
+#endif
 }
+
+#if defined(WS_SIM7670G_V2)
+void OBDClass::closeBLE() {
+    stopConnect = true;
+    initDone = false;
+    elm327.connected = false;
+    serialBLE.disconnect();
+    connectedBTAddress.clear();
+    connectionPhase = "disconnected";
+    if (connectErrorCallback) connectErrorCallback();
+}
+
+void OBDClass::prepareBLEScan() {
+    closeBLE();
+    connectionError = "none";
+    bleDisconnectReason = 0;
+    serialBLE.begin("OBD2MQTT");
+    connectionPhase = "scanning";
+}
+
+bool OBDClass::connectBLE(const String &name, const String &mac, uint8_t addressType) {
+    closeBLE();
+    stopConnect = false;
+    connectionError = "none";
+    bleDisconnectReason = 0;
+    connectionPhase = "connecting";
+    Serial.printf("[OBD] connecting peer=%s address_type=%u protocol=%c\n", mac.c_str(), addressType, protocol);
+    if (!serialBLE.begin("OBD2MQTT")) {
+        connectionError = "ble_init_failed";
+        connectionPhase = "bluetooth_error";
+        return false;
+    }
+    // String constructor preserves MAC byte order and the scanned address type.
+    if (!serialBLE.connect(NimBLEAddress(mac.c_str(), addressType))) {
+        const char* failure = serialBLE.getLastError();
+        const int reason = serialBLE.getLastDisconnectReason();
+        closeBLE();
+        connectionError = failure;
+        bleDisconnectReason = reason;
+        connectionPhase = "bluetooth_error";
+        return false;
+    }
+    connectionPhase = "initializing";
+    Serial.println("[OBD] BLE transport ready; initializing ELM327");
+    if (!elm327.begin(serialBLE, debug, 2000, protocol) || !serialBLE.connected()) {
+        const char* failure = serialBLE.connected() ? elm327.lastInitError : "link_disconnected_during_elm";
+        const int reason = serialBLE.getLastDisconnectReason();
+        Serial.printf("[OBD] ELM init failed code=%s command=%s state=%d reason=%d\n",
+                      failure, elm327.lastInitCommand, static_cast<int>(elm327.lastInitState), reason);
+        closeBLE();
+        connectionError = failure;
+        bleDisconnectReason = reason;
+        connectionPhase = "elm_error";
+        return false;
+    }
+    connectedBTAddress = mac.c_str();
+    setCheckPidSupport(checkPidSupport);
+    elm327.specifyNumResponses = specifyNumResponses;
+    initDone = true;
+    connectionPhase = "connected";
+    connectionError = "none";
+    Serial.printf("Connected to ELM327: %s (%s)\n", name.c_str(), mac.c_str());
+    if (connectedCallback) connectedCallback();
+    return true;
+}
+#endif
 
 BLEScanResultsSet *OBDClass::discoverBLEDevices() {
     serialBLE.discoverClear();
@@ -492,6 +566,11 @@ void OBDClass::begin(const String &devName, const String &devMac, const char pro
 #else
     serialBt.register_callback(BTEvent);
 #endif
+}
+
+void OBDClass::setDebug(bool enabled) {
+    debug = enabled;
+    elm327.debugMode = enabled;
 }
 
 void OBDClass::end() {
@@ -738,7 +817,7 @@ DTCs *OBDClass::getDTCs() {
 }
 
 bool OBDClass::resetDTCs() {
-    return elm327.resetDTC();
+    return !hasPendingQuery() && elm327.prepareHeader(0) && elm327.resetDTC();
 }
 
 #ifdef USE_BLE

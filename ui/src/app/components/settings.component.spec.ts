@@ -23,6 +23,8 @@ import { of } from "rxjs";
 import { ReactiveFormsModule } from "@angular/forms";
 import { NgbTypeaheadModule } from "@ng-bootstrap/ng-bootstrap";
 import { ToastService } from "../services/toast.service";
+import { OBDConnectionStatusComponent } from './obdConnectionStatus.component';
+import { provideRouter } from '@angular/router';
 
 const testSettings: Settings = {
     wifi: {
@@ -31,6 +33,7 @@ const testSettings: Settings = {
 };
 
 export class MockApiService {
+    obdStatus() { return of({supported: false}); }
 
     configuration() {
         return of({deviceType: "T-A7670X"} as Configuration)
@@ -66,8 +69,8 @@ describe("SettingsComponent", () => {
         waitForAsync(() => {
             TestBed.configureTestingModule({
                 declarations: [SettingsComponent],
-                imports: [NgbTypeaheadModule, ReactiveFormsModule],
-                providers: [{provide: ApiService, useClass: MockApiService}, ToastService],
+                imports: [NgbTypeaheadModule, ReactiveFormsModule, OBDConnectionStatusComponent],
+                providers: [{provide: ApiService, useClass: MockApiService}, ToastService, provideRouter([])],
                 teardown: {destroyAfterEach: true},
             }).compileComponents();
         })

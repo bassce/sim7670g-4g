@@ -43,6 +43,26 @@ import {
 import { DomSanitizer } from "@angular/platform-browser";
 import { ToastService } from "../services/toast.service";
 
+export function querySettingsValidator(): ValidatorFn {
+    return control => {
+        const p = control.value;
+        const fail = (message: string) => ({invalidQuery: message});
+        for (const key of ['protocol', 'receiveHeader', 'flowControlHeader', 'flowControlData', 'dataOffset', 'dataLength']) {
+            if (!Number.isInteger(p[key])) return fail('Query settings must be whole numbers.');
+        }
+        if (![0, 6, 7, 8, 9].includes(p.protocol)) return fail('Choose an ISO 15765 CAN protocol or the connection protocol.');
+        if ([6, 8].includes(p.protocol) && [p.header, p.receiveHeader, p.flowControlHeader].some(v => v > 2047))
+            return fail('An 11-bit CAN address cannot exceed 2047.');
+        const st = p.flowControlData & 255;
+        if (p.flowControlHeader && ((p.flowControlData >>> 16) !== 0x30 || !(st <= 0x7F || (st >= 0xF1 && st <= 0xF9))))
+            return fail('Flow-control data must start with 0x30 and use a valid separation time.');
+        if (!p.dataLength && (p.dataOffset || p.signedValue)) return fail('Select a field length before using an offset or signed value.');
+        if (p.dataLength && p.dataOffset + p.dataLength > p.numExpectedBytes)
+            return fail('The selected field exceeds Expected Bytes.');
+        return null;
+    };
+}
+
 export function expressionValidator(checkStates: boolean = true, allowedVariables: Array<string> = [],
                                     allowedFunctions: Array<string> = []): ValidatorFn {
     const varReg = /\$([^\s),$]+)/g;
@@ -219,13 +239,20 @@ export class OBDStatesComponent implements OnInit {
             pid: new FormGroup({
                 service: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(255)]),
                 pid: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(65535)]),
-                header: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(4294967295)]),
-                numResponses: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(16)]),
-                numExpectedBytes: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(16)]),
+                header: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(536870911)]),
+                protocol: new FormControl<number>(0, [Validators.required, Validators.pattern('^(0|[6-9])$')]),
+                receiveHeader: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(536870911)]),
+                flowControlHeader: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(536870911)]),
+                flowControlData: new FormControl<number>(3145728, [Validators.required, Validators.min(0), Validators.max(16777215)]),
+                dataOffset: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(7)]),
+                dataLength: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(8)]),
+                signedValue: new FormControl<boolean>(false),
+                numResponses: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(15)]),
+                numExpectedBytes: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(8)]),
                 responseFormat: new FormControl<number>(0, Validators.required),
                 scaleFactor: new FormControl<string | null>(null, [Validators.maxLength(256)]),
                 bias: new FormControl<number>(0),
-            }),
+            }, {validators: querySettingsValidator()}),
             value: new FormGroup({
                 format: new FormControl<string | null>(null),
                 func: new FormControl<string | null>(""),

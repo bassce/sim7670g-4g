@@ -42,6 +42,8 @@
 #include "device_simA76xx.h"
 #elif defined(LILYGO_SIM7000G) or defined(LILYGO_SIM7070G)
 #include "device_sim7xxx.h"
+#elif defined(WS_SIM7670G_V2)
+#include "device_ws_sim7670g_v2.h"
 #elif defined(WS_A7670E) or defined(WS_A7670E_R2)
 #include "device_ws.h"
 #endif
@@ -85,7 +87,18 @@
 class GSM {
     std::string ipAddress;
     unsigned int reconnectAttempts;
-    int networkMode;
+    int networkMode = 2;
+#if defined(WS_SIM7670G_V2)
+    bool modemReady = false;
+    bool gpsReady = false;
+    bool dataConnected = false;
+    uint32_t nextNetworkCheck = 0;
+    uint32_t nextGPSAttempt = 0;
+    bool initSIM7670G(bool cyclePower);
+    bool checkSIM7670GNetwork();
+    bool enableSIM7670GGPS();
+    bool readSIM7670GGPS(float& latitude, float& longitude, float& accuracy);
+#endif
 
     TinyGsmClient *client = nullptr;
     TinyGsmClientSecure *secureClient = nullptr;

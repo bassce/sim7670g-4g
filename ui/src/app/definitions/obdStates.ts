@@ -38,6 +38,13 @@ export interface PID {
     service: number;
     pid: number;
     header: number;
+    protocol?: number;
+    receiveHeader?: number;
+    flowControlHeader?: number;
+    flowControlData?: number;
+    dataOffset?: number;
+    dataLength?: number;
+    signedValue?: boolean;
     numResponses: number;
     numExpectedBytes: number;
     responseFormat: OBDResponseFormat;

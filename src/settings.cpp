@@ -18,6 +18,7 @@
 
 #include <FS.h>
 #include <ArduinoJson.h>
+#include "AtomicJsonFile.h"
 
 SettingsClass::SettingsClass() = default;
 
@@ -54,21 +55,9 @@ bool SettingsClass::readSettings(fs::FS &fs) {
 }
 
 bool SettingsClass::writeSettings(fs::FS &fs) {
-    bool success = false;
-
-    File file = fs.open(SETTINGS_FILE, FILE_WRITE);
-    if (!file) {
-        Serial.println("Failed to open file settings.json for writing.");
-        return false;
-    }
-
     JsonDocument doc;
     writeJson(doc);
-    success = serializeJson(doc, file);
-
-    file.close();
-
-    return success;
+    return writeJsonAtomic(fs, SETTINGS_FILE, doc);
 }
 
 std::string SettingsClass::buildJson() {
@@ -84,7 +73,7 @@ std::string SettingsClass::buildJson() {
 bool SettingsClass::parseJson(std::string json) {
     bool success = false;
     JsonDocument doc;
-    if (!deserializeJson(doc, json)) {
+    if (!deserializeJson(doc, json) && doc.is<JsonObject>()) {
         readJson(doc);
         success = true;
     }
@@ -204,6 +193,7 @@ void MobileSettings::setPassword(const char *password) {
 }
 
 void OBD2Settings::readJson(JsonDocument &doc) {
+    obd2.addressType = doc["obd2"]["addressType"] | 0;
     obd2.disable = doc["obd2"]["disable"] | false;
     strlcpy(obd2.name, doc["obd2"]["name"] | "", sizeof(obd2.name));
     strlcpy(obd2.mac, doc["obd2"]["mac"] | "", sizeof(obd2.mac));
@@ -214,6 +204,7 @@ void OBD2Settings::readJson(JsonDocument &doc) {
 }
 
 void OBD2Settings::writeJson(JsonDocument &doc) {
+    doc["obd2"]["addressType"] = obd2.addressType;
     doc["obd2"]["disable"] = obd2.disable;
     doc["obd2"]["name"] = obd2.name;
     doc["obd2"]["mac"] = obd2.mac;

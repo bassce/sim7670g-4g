@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
+  "name": "BLESerial",
+  "version": "1.0.0+main.1",
+  "description": "Simple UART to Bluetooth BLE bridge",
+  "keywords": "uart, serial, ble",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adlerre/BLESerial.git"
+  },
+  "authors": [
+    {
+      "name": "Ren\u8305 Adler",
+      "maintainer": true
+    }
+  ],
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "h2zero/NimBLE-Arduino": "2.3.7"
+  },
+  "frameworks": "arduino",
+  "platforms": "*"
+}

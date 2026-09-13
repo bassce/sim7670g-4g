@@ -22,6 +22,7 @@
 #endif
 
 #include <bitset>
+#include <atomic>
 #include <FS.h>
 #include <OBDStates.h>
 
@@ -92,8 +93,8 @@ class OBDClass : public OBDStates {
 #endif
     ELM327 elm327;
 
-    bool initDone = false;
-    bool stopConnect = false;
+    std::atomic_bool initDone{false};
+    std::atomic_bool stopConnect{false};
 
     String devName;
     String devMac;
@@ -143,6 +144,14 @@ class OBDClass : public OBDStates {
     T *setFormatFuncByName(const char *funcName, T *state);
 
 public:
+#if defined(WS_SIM7670G_V2)
+    std::atomic<const char *> connectionPhase{"disabled"};
+    std::atomic<const char *> connectionError{"none"};
+    std::atomic_int bleDisconnectReason{0};
+    void closeBLE();
+    bool connectBLE(const String &name, const String &mac, uint8_t addressType);
+    void prepareBLEScan();
+#endif
     OBDClass();
 
     bool parseJSON(std::string &json);
@@ -157,6 +166,7 @@ public:
                bool debug = false, bool specifyNumResponses = true);
 
     void end();
+    void setDebug(bool enabled);
 
     void connect(bool reconnect = false);
 

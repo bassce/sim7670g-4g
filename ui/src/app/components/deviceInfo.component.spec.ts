@@ -19,6 +19,8 @@ import { DTCs, ModemInfo, WifiInfo } from "../definitions";
 import { of } from "rxjs";
 import { DeviceInfoComponent } from "./deviceInfo.component";
 import { ApiService } from "../services/api.service";
+import { OBDConnectionStatusComponent } from './obdConnectionStatus.component';
+import { provideRouter } from '@angular/router';
 import { ComponentFixture, inject, TestBed, waitForAsync } from "@angular/core/testing";
 
 const testWiFiInfo: WifiInfo = {
@@ -41,6 +43,7 @@ const dtcs: DTCs = {
 };
 
 export class MockApiService {
+    obdStatus() { return of({supported: false}); }
 
     version() {
         return of("1.0.0");
@@ -78,7 +81,8 @@ describe("DeviceInfoComponent", () => {
         waitForAsync(() => {
             TestBed.configureTestingModule({
                 declarations: [DeviceInfoComponent],
-                providers: [{provide: ApiService, useClass: MockApiService}],
+                imports: [OBDConnectionStatusComponent],
+                providers: [{provide: ApiService, useClass: MockApiService}, provideRouter([])],
                 teardown: {destroyAfterEach: true},
             }).compileComponents();
         })

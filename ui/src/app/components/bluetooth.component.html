@@ -1,0 +1,37 @@
+<section aria-labelledby="bluetooth-title">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 id="bluetooth-title" class="h4 mb-0">Connect Bluetooth OBD</h2>
+    <button type="button" class="btn btn-outline-secondary" (click)="back()">Back</button>
+  </div>
+  <p>Power on or wake your OBD adapter, enter pairing mode if required, and disconnect other diagnostic apps. Scan nearby devices, then choose your adapter.</p>
+  <p class="text-body-secondary">Uses the Protocol selected on the settings page. Successful connection saves the adapter and returns to the previous page.</p>
+  @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
+  @if (status && !status.supported) {
+    <div class="alert alert-info">This firmware does not support the Bluetooth connection page.</div>
+  } @else {
+    <button type="button" class="btn btn-primary mb-3" (click)="scan()"
+      [disabled]="!status || status.busy || requesting">Scan nearby Bluetooth</button>
+    <div class="mb-3" role="status" aria-live="polite">
+      @if (status?.busy || requesting) { <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span> }
+      {{ status ? labels[status.state] || status.state : 'Loading connection status…' }}
+    </div>
+    @if (status?.devices?.length) {
+      <div class="list-group">
+        @for (device of status.devices; track device.mac + '-' + device.addressType) {
+          <div class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+              <strong>{{ device.name || 'Unnamed device' }}</strong>
+              <div class="text-body-secondary"><code>{{ device.mac }}</code> · {{ device.rssi }} dBm</div>
+              <small>{{ device.advertisedOBD ? 'OBD serial service advertised' : 'Compatibility will be checked on connection' }}</small>
+            </div>
+            <button type="button" class="btn btn-outline-primary" (click)="connect(device)"
+              [attr.aria-label]="'Connect to ' + (device.name || device.mac)"
+              [disabled]="status.busy || requesting || !protocol">Connect</button>
+          </div>
+        }
+      </div>
+    } @else if (status?.state === 'scan_complete') {
+      <p>No Bluetooth devices found. Move the adapter closer, check its power, then scan again.</p>
+    }
+  }
+</section>

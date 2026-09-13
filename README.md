@@ -1,3 +1,9 @@
+# SIM7670G-4G
+
+Waveshare SIM7670G V2 派生版本：请先阅读 [版本说明](SIM7670G-FORK.md)、[语言资源](translations/) 和 [车型模板](pids/)。原作者说明保留如下。
+
+---
+
 # OBD2 to MQTT for Home Assistant
 
 ## What you need?
@@ -30,6 +36,7 @@
 | [T-SIM7000G](https://lilygo.cc/products/t-sim7000g)                             | T-SIM7000G                                                           | ✅                             |                                                                                                                                                                                                                         |
 | [T-SIM7070G](https://lilygo.cc/products/t-sim7070g)                             | T-SIM7070G                                                           | ✅                             |                                                                                                                                                                                                                         |
 | [Waveshare ESP32 S3 A7670E](https://www.waveshare.com/esp32-s3-a7670e-4g.htm)   | WS-A7670E_BLE (BLE only)                                             | ✅                             |                                                                                                                                                                                                                         |
+| Waveshare ESP32-S3-A-SIM7670X-4G-V2 (SIM7670G) | WS-SIM7670G-V2_BLE (BLE only) | Experimental; hardware verification pending | [Build and board notes](SIM7670G-V2.md) |
 
 ## Getting started
 

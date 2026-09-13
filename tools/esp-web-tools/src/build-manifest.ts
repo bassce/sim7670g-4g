@@ -126,8 +126,9 @@ try {
 
     if (manifest && manifest.builds && manifest.builds.length > 0) {
         DEVICES.forEach(device => {
+            const isSIM7670GV2 = device === "WS-SIM7670G-V2_BLE";
             const build: Build = {
-                chipFamily: "ESP32",
+                chipFamily: isSIM7670GV2 ? "ESP32-S3" : "ESP32",
                 parts: []
             };
 
@@ -144,6 +145,7 @@ try {
                     let binDir: string = "";
                     const dirname = path.dirname(part.path);
                     const basename = path.basename(part.path);
+                    if (isSIM7670GV2 && basename === "bootloader.bin") part.offset = 0;
 
                     if (localDev) {
                         binDir = path.join(distDir, dirname, device);

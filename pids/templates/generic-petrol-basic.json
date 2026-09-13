@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "generic-petrol-basic",
+  "version": "1.0.0",
+  "validation": "Standard OBD example; not verified on a petrol vehicle in this project.",
+  "states": [
+    {
+      "type": 0,
+      "valueType": "int",
+      "enabled": true,
+      "visible": true,
+      "interval": 2000,
+      "name": "rpm",
+      "description": {
+        "en": "Revolutions per minute",
+        "zh-CN": "发动机转速"
+      },
+      "icon": "engine",
+      "unit": "",
+      "deviceClass": "",
+      "measurement": true,
+      "diagnostic": false,
+      "pid": {
+        "service": 1,
+        "pid": 12,
+        "numResponses": 0,
+        "numExpectedBytes": 2,
+        "scaleFactor": "1.0 / 4.0"
+      },
+      "value": {
+        "format": "%d"
+      }
+    },
+    {
+      "type": 0,
+      "valueType": "int",
+      "enabled": true,
+      "visible": true,
+      "interval": 2000,
+      "name": "speed",
+      "description": {
+        "en": "Kilometer per Hour",
+        "zh-CN": "车速"
+      },
+      "icon": "speedometer",
+      "unit": "km/h",
+      "deviceClass": "speed",
+      "measurement": true,
+      "diagnostic": false,
+      "pid": {
+        "service": 1,
+        "pid": 13,
+        "numResponses": 0,
+        "numExpectedBytes": 1,
+        "scaleFactor": "1"
+      },
+      "value": {
+        "format": "%d"
+      }
+    },
+    {
+      "type": 0,
+      "valueType": "int",
+      "enabled": true,
+      "visible": true,
+      "interval": 2000,
+      "name": "engineCoolantTemp",
+      "description": {
+        "en": "Engine Coolant Temperature",
+        "zh-CN": "冷却液温度"
+      },
+      "icon": "thermometer",
+      "unit": "°C",
+      "deviceClass": "temperature",
+      "measurement": true,
+      "diagnostic": false,
+      "pid": {
+        "service": 1,
+        "pid": 5,
+        "numResponses": 0,
+        "numExpectedBytes": 1,
+        "scaleFactor": "1",
+        "bias": -40
+      },
+      "value": {
+        "format": "%d"
+      }
+    }
+  ]
+}

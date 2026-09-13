@@ -47,10 +47,14 @@ void OBDStates::clearStates() {
     if (!states.empty()) {
         for (unsigned i = 0; i < states.size(); ++i) {
             OBDState *state = states[i];
-            free(state);
+            delete state;
         }
         states.clear();
     }
+}
+
+bool OBDStates::hasPendingQuery() const {
+    return std::any_of(states.begin(), states.end(), [](const OBDState* state) { return state->isProcessing(); });
 }
 
 void OBDStates::getStates(const std::function<bool(OBDState *)> &pred, std::vector<OBDState *> &states) {
@@ -63,8 +67,13 @@ void OBDStates::getStates(const std::function<bool(OBDState *)> &pred, std::vect
 }
 
 bool OBDStates::compareStates(const OBDState *a, const OBDState *b) {
-    return a->isProcessing() && !b->isProcessing()
-           || (a->getLastUpdate() + a->getUpdateInterval()) < (b->getLastUpdate() + b->getUpdateInterval());
+    if (a->isProcessing() != b->isProcessing()) return a->isProcessing();
+    const uint32_t now = millis();
+    const uint32_t aInterval = a->getUpdateInterval() < 0 ? 1000U : std::max(50L, a->getUpdateInterval());
+    const uint32_t bInterval = b->getUpdateInterval() < 0 ? 1000U : std::max(50L, b->getUpdateInterval());
+    const int64_t aOverdue = int64_t(uint32_t(now - a->getLastAttempt())) - aInterval;
+    const int64_t bOverdue = int64_t(uint32_t(now - b->getLastAttempt())) - bInterval;
+    return aOverdue > bOverdue;
 }
 
 template<typename T>
@@ -157,6 +166,8 @@ void OBDStates::addState(OBDState *state) {
         state->setELM327(elm327);
         state->setCheckPidSupport(checkPidSupport);
         states.push_back(state);
+    } else {
+        delete state;
     }
 }
 
@@ -174,7 +185,8 @@ double OBDStates::avgLastUpdate(const std::function<bool(OBDState *)> &pred) {
     for (auto &state: readStates) {
         data.push_back(millis() - state->getLastUpdate());
     }
-    int sum = std::accumulate(data.begin(), data.end(), 0);
+    if (data.empty()) return 0.0;
+    uint64_t sum = std::accumulate(data.begin(), data.end(), uint64_t{0});
     return static_cast<double>(sum) / data.size();
 }
 
@@ -182,15 +194,19 @@ OBDState *OBDStates::nextState() {
     if (!states.empty() && elm327 != nullptr && elm327->elm_port) {
         std::vector<OBDState *> readStates{};
         getStates([](const OBDState *state) {
-            return state->isEnabled() &&
+            return state->isEnabled() && (!state->isInit() || state->isSupported()) &&
                    (state->getType() ==  obd::READ || state->getType() ==  obd::CALC && state->hasCalcExpression()) &&
                    (state->getUpdateInterval() != -1 || state->getUpdateInterval() == -1 && state->getLastUpdate() ==
                     0);
         }, readStates);
-        sort(readStates.begin(), readStates.end(), compareStates);
+        if (readStates.empty()) return nullptr;
+        // Pick one due item without requiring a comparator to observe a frozen clock.
+        auto* chosen = readStates.front();
+        for (auto* candidate : readStates) if (compareStates(candidate, chosen)) chosen = candidate;
 
-        OBDState &state = *readStates.at(0);
-        if (state.getUpdateInterval() == -1 || state.getLastUpdate() + state.getUpdateInterval() < millis()) {
+        OBDState &state = *chosen;
+        const uint32_t interval = state.getUpdateInterval() < 0 ? 1000U : std::max(50L, state.getUpdateInterval());
+        if (state.isProcessing() || uint32_t(millis() - state.getLastAttempt()) >= interval) {
             // int aFreeInternalHeapSizeBefore = heap_caps_get_free_size(MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL);
 
             if (state.getType() ==  obd::READ) {

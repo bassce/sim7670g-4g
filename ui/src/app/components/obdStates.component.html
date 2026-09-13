@@ -261,6 +261,52 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <details class="mb-3">
+                                        <summary>Advanced ECU addressing and data field</summary>
+                                        <p class="form-text">Use the vehicle's verified query settings. Defaults use the connection protocol and automatic reception. Settings are restored after each query.</p>
+                                        <label for="query-protocol-{{ i }}" class="form-label">Query protocol</label>
+                                        <select formControlName="protocol" id="query-protocol-{{ i }}" class="form-select mb-2">
+                                            <option [ngValue]="0">Use connection protocol</option>
+                                            <option [ngValue]="6">CAN 11 bit / 500 kbit/s (6)</option>
+                                            <option [ngValue]="7">CAN 29 bit / 500 kbit/s (7)</option>
+                                            <option [ngValue]="8">CAN 11 bit / 250 kbit/s (8)</option>
+                                            <option [ngValue]="9">CAN 29 bit / 250 kbit/s (9)</option>
+                                        </select>
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <label for="receive-header-{{ i }}" class="form-label">Receive header (decimal; 0 = automatic)</label>
+                                                <input formControlName="receiveHeader" type="number" id="receive-header-{{ i }}" class="form-control" min="0" max="536870911">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="fc-header-{{ i }}" class="form-label">Flow-control header (decimal; 0 = automatic)</label>
+                                                <input formControlName="flowControlHeader" type="number" id="fc-header-{{ i }}" class="form-control" min="0" max="536870911">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="fc-data-{{ i }}" class="form-label">Flow-control data (decimal)</label>
+                                                <input formControlName="flowControlData" type="number" id="fc-data-{{ i }}" class="form-control" min="0" max="16777215">
+                                                <div class="form-text">3145728 = 0x300000</div>
+                                            </div>
+                                        </div>
+                                        <p class="form-text">CAN queries without a receive filter, and multi-frame values, wait for all replies even when “Specify number of responses” is enabled. Set Responses to 0 to always wait.</p>
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <label for="data-offset-{{ i }}" class="form-label">Data byte offset (0 = first)</label>
+                                                <input formControlName="dataOffset" type="number" id="data-offset-{{ i }}" class="form-control" min="0" max="7">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="data-length-{{ i }}" class="form-label">Field length (0 = normal decoding)</label>
+                                                <input formControlName="dataLength" type="number" id="data-length-{{ i }}" class="form-control" min="0" max="8">
+                                            </div>
+                                            <div class="col-md-4 align-self-center">
+                                                <input formControlName="signedValue" type="checkbox" id="signed-value-{{ i }}" class="form-check-input me-2">
+                                                <label for="signed-value-{{ i }}" class="form-check-label">Signed field</label>
+                                            </div>
+                                        </div>
+                                        <p class="form-text">Offsets start after service/PID bytes. Expected Bytes is the complete data length. A selected field uses Scale factor / Bias and overrides Response Format.</p>
+                                        @if (state.controls.pid.errors?.invalidQuery) {
+                                            <p class="text-danger">{{ state.controls.pid.errors.invalidQuery }}</p>
+                                        }
+                                    </details>
                                     <div class="row mb-2">
                                         <label for="scaleFactor-{{ i }}" class="col-sm-2 col-form-label">Scale factor /
                                             Bias</label>

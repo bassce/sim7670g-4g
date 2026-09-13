@@ -129,6 +129,7 @@ class OBD2Settings {
         bool disable;
         char name[65];
         char mac[19];
+        uint8_t addressType;
         bool checkPIDSupport;
         bool debug;
         bool specifyNumResponses;
@@ -153,6 +154,8 @@ public:
     String getMAC() const;
 
     void setMAC(const char *mac);
+    uint8_t getAddressType() const { return obd2.addressType; }
+    void setAddressType(uint8_t value) { obd2.addressType = value; }
 
     bool getCheckPIDSupport() const;
 

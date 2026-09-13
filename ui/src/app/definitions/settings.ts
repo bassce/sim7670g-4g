@@ -44,7 +44,7 @@ export interface MobileSettings {
 export enum OBD2Protocol {
     AUTOMATIC = "0",
     SAE_J1850_PWM_41_KBAUD = "1",
-    SAE_J1850_PWM_10_KBAUD = "2",
+    SAE_J1850_VPW_10_KBAUD = "2",
     ISO_9141_5_BAUD_INIT = "3",
     ISO_14230_5_BAUD_INIT = "4",
     ISO_14230_FAST_INIT = "5",
@@ -56,6 +56,8 @@ export enum OBD2Protocol {
 }
 
 export interface OBD2Settings {
+    disable?: boolean;
+    addressType?: number;
     name?: string;
     mac?: string;
     checkPIDSupport?: boolean;
