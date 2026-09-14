@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "vw-id4-basic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "validation": "Four queries verified on one ID.4 with iCar Pro 2S; other model years and long-term stability require testing.",
   "states": [
     {
@@ -13,7 +13,8 @@
       "name": "batterySocObd",
       "description": {
         "en": "Battery SOC (OBD 015B)",
-        "zh-CN": "电池剩余电量（OBD）"
+        "zh-CN": "电池剩余电量（OBD）",
+        "ja": "バッテリー残量（OBD）"
       },
       "icon": "battery",
       "unit": "%",
@@ -50,7 +51,8 @@
       "name": "batteryCurrent",
       "description": {
         "en": "Battery current (OBD 019A)",
-        "zh-CN": "电池电流"
+        "zh-CN": "电池电流",
+        "ja": "バッテリー電流"
       },
       "icon": "battery",
       "unit": "A",
@@ -87,7 +89,8 @@
       "name": "batterySoc",
       "description": {
         "en": "HV Battery SOC (UDS 028C)",
-        "zh-CN": "电池剩余电量（UDS）"
+        "zh-CN": "电池剩余电量（UDS）",
+        "ja": "バッテリー残量（UDS）"
       },
       "icon": "battery",
       "unit": "%",
@@ -124,7 +127,8 @@
       "name": "hvBatteryVoltage",
       "description": {
         "en": "HV Battery voltage (UDS 1E3B)",
-        "zh-CN": "动力电池电压"
+        "zh-CN": "动力电池电压",
+        "ja": "駆動用バッテリー電圧"
       },
       "icon": "battery",
       "unit": "V",

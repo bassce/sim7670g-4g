@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "uiSchemaVersion": 1,
   "locale": "en",
   "name": "English",
@@ -255,6 +255,29 @@
     "api.deviceBusy": "Device is busy; retry saving shortly",
     "api.waitBluetooth": "Wait for Bluetooth operation to finish",
     "api.waitObd": "Wait for the current OBD reply to finish",
-    "templates.title": "Vehicle templates"
+    "templates.title": "Vehicle templates",
+    "resources.title": "Language & templates",
+    "resources.help": "Downloads use the device's mobile network. Saved languages work offline. Your current vehicle configuration is kept until you apply a template.",
+    "resources.source": "Download source",
+    "resources.auto": "Automatic (Gitee first, GitHub fallback)",
+    "resources.gitee": "Gitee",
+    "resources.github": "GitHub",
+    "resources.refresh": "Refresh online catalogs",
+    "resources.working": "Downloading and verifying. Please wait…",
+    "resources.failed": "Operation failed. Previous settings are kept. Error:",
+    "resources.refreshed": "Online catalogs updated.",
+    "resources.languageApplied": "Language applied and saved on the device.",
+    "resources.useLanguage": "Use language",
+    "resources.builtins": "Built-in test templates",
+    "resources.vehicleScope": "The petrol example requires standard OBD PID support. The ID.4 example was verified on one vehicle and is not a universal EV profile.",
+    "resources.petrol": "Petrol · basic OBD test",
+    "resources.id4": "Volkswagen ID.4 · four verified readings",
+    "resources.loadCatalog": "Refresh the online catalogs to see available vehicle templates.",
+    "resources.preview": "Preview",
+    "resources.previewHelp": "Downloading or previewing does not change the active queries. Applying replaces the full OBD data list; export your current list first.",
+    "resources.apply": "Apply template",
+    "resources.replaceConfirm": "Replace the entire OBD data list with this template? A backup download will be requested before saving.",
+    "resources.applied": "Template applied. You can customize its items on the OBD page.",
+    "resources.updateLanguage": "Update language pack online"
   }
 }

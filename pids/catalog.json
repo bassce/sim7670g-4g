@@ -4,14 +4,23 @@
     {
       "id": "generic-petrol-basic",
       "path": "templates/generic-petrol-basic.json",
-      "sha256": "ff7db64957ce8c59819d9a11a16239c0a9ed1e46189440f03146a1e0bf515334",
-      "importPath": "import/generic-petrol-basic.en.json"
+      "sha256": "15c2f0dbef4154e24a42ca4880ffc961d1f5605c323cca8a11401b3dbc6d9f78",
+      "importPath": "import/generic-petrol-basic.en.json",
+      "bytes": 2071,
+      "localizedImportPaths": {
+        "ja": "import/generic-petrol-basic.ja.json"
+      }
     },
     {
       "id": "vw-id4-basic",
       "path": "templates/vw-id4-basic.json",
-      "sha256": "82e2340724c03c12da924a1f061b03c13070ef1f55a6731456bd215f610c070c",
-      "importPath": "import/vw-id4-basic.en.json"
+      "sha256": "0f95db29198ed033f4bbaea2be71be4a330b23740a7465395ea19cde6561e50f",
+      "importPath": "import/vw-id4-basic.en.json",
+      "bytes": 4016,
+      "localizedImportPaths": {
+        "ja": "import/vw-id4-basic.ja.json"
+      }
     }
-  ]
+  ],
+  "version": "1.0.1"
 }

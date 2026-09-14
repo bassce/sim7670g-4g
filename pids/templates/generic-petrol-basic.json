@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "generic-petrol-basic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "validation": "Standard OBD example; not verified on a petrol vehicle in this project.",
   "states": [
     {
@@ -13,7 +13,8 @@
       "name": "rpm",
       "description": {
         "en": "Revolutions per minute",
-        "zh-CN": "发动机转速"
+        "zh-CN": "发动机转速",
+        "ja": "エンジン回転数"
       },
       "icon": "engine",
       "unit": "",
@@ -40,7 +41,8 @@
       "name": "speed",
       "description": {
         "en": "Kilometer per Hour",
-        "zh-CN": "车速"
+        "zh-CN": "车速",
+        "ja": "車速"
       },
       "icon": "speedometer",
       "unit": "km/h",
@@ -67,7 +69,8 @@
       "name": "engineCoolantTemp",
       "description": {
         "en": "Engine Coolant Temperature",
-        "zh-CN": "冷却液温度"
+        "zh-CN": "冷却液温度",
+        "ja": "冷却水温度"
       },
       "icon": "thermometer",
       "unit": "°C",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "uiSchemaVersion": 1,
   "locale": "zh-CN",
   "name": "简体中文",
@@ -255,6 +255,29 @@
     "api.deviceBusy": "设备正在忙，请稍后重新保存。",
     "api.waitBluetooth": "请等待蓝牙操作完成。",
     "api.waitObd": "请等待当前 OBD 查询响应结束。",
-    "templates.title": "车型模板"
+    "templates.title": "车型模板",
+    "resources.title": "语言与模板",
+    "resources.help": "下载使用设备的移动网络，已保存的语言可离线使用。应用模板前，当前车辆配置保持不变。",
+    "resources.source": "下载源",
+    "resources.auto": "自动（优先 Gitee，失败后尝试 GitHub）",
+    "resources.gitee": "Gitee",
+    "resources.github": "GitHub",
+    "resources.refresh": "刷新在线目录",
+    "resources.working": "正在下载并校验，请稍候…",
+    "resources.failed": "操作失败，原有设置已保留。错误：",
+    "resources.refreshed": "在线目录已更新。",
+    "resources.languageApplied": "语言已应用并保存到设备。",
+    "resources.useLanguage": "应用语言",
+    "resources.builtins": "内置测试模板",
+    "resources.vehicleScope": "燃油车示例需要车辆支持对应的标准 OBD PID。ID.4 示例已在本车验证，不适用于所有电动车。",
+    "resources.petrol": "燃油车 · 基础 OBD 测试",
+    "resources.id4": "大众 ID.4 · 四项已验证数据",
+    "resources.loadCatalog": "刷新在线目录后，可查看可用的车型模板。",
+    "resources.preview": "预览",
+    "resources.previewHelp": "下载和预览不会改变当前查询。应用模板会替换整个 OBD 数据列表，请先导出当前配置。",
+    "resources.apply": "应用模板",
+    "resources.replaceConfirm": "确定用此模板替换整个 OBD 数据列表吗？保存前会先下载当前配置的备份。",
+    "resources.applied": "模板已应用，可前往 OBD 数据页自定义各项参数。",
+    "resources.updateLanguage": "在线更新语言包"
   }
 }

@@ -1,251 +1,274 @@
-key	en	zh-CN
-app.title	OBD2 to MQTT for Home Assistant	OBD2 转 MQTT · Home Assistant
-nav.info	Info	设备信息
-nav.settings	Settings	设置
-nav.obd	OBD	OBD 数据
-nav.ota	OTA	固件上传
-common.save	Save	保存
-common.cancel	Cancel	取消
-common.download	Download	下载
-common.upload	Upload	上传
-common.back	Back	返回
-common.connect	Connect	连接
-common.none	none	无
-common.username	Username	用户名
-common.password	Password	密码
-common.ssid	SSID	热点名称（SSID）
-common.ip	IP	IP 地址
-common.mac	MAC	MAC 地址
-common.name	Name	名称
-common.version	Version	版本
-common.seconds	sec	秒
-common.hex	HEX	十六进制
-common.decimal	DEC	十进制
-common.reboot	Reboot	重启设备
-common.rebootConfirm	Are you sure you want to reboot?	确定要重启设备吗？
-common.switchTheme	Switch Color Scheme	切换明暗主题
-common.errorWithDetail	Operation failed: {detail}	操作失败：{detail}
-info.firmware	Firmware	固件
-info.wifi	WiFi Info	Wi-Fi 信息
-info.modem	Modem Info	移动通信模块信息
-info.signalQuality	Signal Quality	信号强度
-info.imei	IMEI	设备识别码（IMEI）
-info.imsi	IMSI	移动用户识别码（IMSI）
-info.ccid	CCID	SIM 卡识别码（CCID）
-info.dtcs	Dagnostic Trouble Codes	诊断故障码
-settings.language	Language	语言
-settings.general	General	通用设置
-settings.sleepTimeout	Auto sleep timeout (sec)	自动休眠等待时间（秒）
-settings.sleepTimeoutPlaceholder	Auto shutdown timeout	自动休眠等待时间
-settings.sleepDuration	Sleep duration (sec)	休眠时长（秒）
-settings.sleepDurationPlaceholder	Sleep duration	休眠时长
-settings.wifi	WiFi Access Point	Wi-Fi 热点
-settings.mobile	Mobile	移动网络
-settings.networkMode	Network Mode	网络模式
-settings.simPin	Sim PIN	SIM 卡 PIN 码
-settings.pinPlaceholder	PIN	PIN 码
-settings.apn	Access Point Name	接入点名称（APN）
-settings.apnPlaceholder	APN	APN
-settings.obd	OBD2/ELM 327 Device	OBD2 / ELM327 适配器
-settings.disableObd	disable OBD connection	禁用 OBD 连接
-settings.protocol	Protocol	车辆通信协议
-settings.checkPidSupport	check if PID is supported	检查车辆是否支持 PID
-settings.specifyResponses	Specify number of responses	指定响应数量
-settings.debug	Debug Mode	调试模式
-settings.debugHelp	Include Bluetooth connection and ELM327 traces in USB serial logs. Applies after saving without reconnecting.	在 USB 串口日志中记录蓝牙连接及 ELM327 通信详情。保存后生效，无需重新连接。
-settings.mqtt	MQTT Broker	MQTT 服务器
-settings.identifierType	Identifier Type	设备标识类型
-settings.identifierSuffix	Identifier Suffix	设备标识后缀
-settings.mqttEndpoint	Protocol/Hostname/Port	传输协议 / 主机地址 / 端口
-settings.hostname	Hostname	主机地址
-settings.port	Port	端口
-settings.tls	use TLS/SSL	使用 TLS/SSL 加密
-settings.offlineBehaviour	Offline behaviour	离线时的行为
-settings.allowOffline	Allow offline	允许离线
-settings.sendInterval	Send Interval	上报间隔
-settings.discoveryInterval	Resend Discovery	重新发送 HA 自动发现配置
-settings.dataInterval	Data	车辆数据
-settings.diagnosticInterval	Diagnostic Data	诊断数据
-settings.locationInterval	GSM/GPS Position	移动网络 / GPS 定位
-settings.saved	Settings updated successfully.	设置已保存。
-network.AUTO	AUTO	自动
-network.GSM	GSM	GSM（2G）
-network.WCDMA	WCDMA	WCDMA（3G）
-network.LTE	LTE	LTE（4G）
-network.GSM_LTE	GSM LTE	GSM / LTE
-protocol.AUTOMATIC	AUTOMATIC	自动选择
-protocol.SAE_J1850_PWM_41_KBAUD	SAE J1850 PWM 41 KBAUD	SAE J1850 PWM（41.6 kbit/s）
-protocol.SAE_J1850_VPW_10_KBAUD	SAE J1850 VPW 10 KBAUD	SAE J1850 VPW（10.4 kbit/s）
-protocol.ISO_9141_5_BAUD_INIT	ISO 9141 5 BAUD INIT	ISO 9141（5 波特初始化）
-protocol.ISO_14230_5_BAUD_INIT	ISO 14230 5 BAUD INIT	ISO 14230（5 波特初始化）
-protocol.ISO_14230_FAST_INIT	ISO 14230 FAST INIT	ISO 14230（快速初始化）
-protocol.ISO_15765_11_BIT_500_KBAUD	ISO 15765 11 BIT 500 KBAUD	ISO 15765 CAN（11 位 / 500 kbit/s）
-protocol.ISO_15765_29_BIT_500_KBAUD	ISO 15765 29 BIT 500 KBAUD	ISO 15765 CAN（29 位 / 500 kbit/s）
-protocol.ISO_15765_11_BIT_250_KBAUD	ISO 15765 11 BIT 250 KBAUD	ISO 15765 CAN（11 位 / 250 kbit/s）
-protocol.ISO_15765_29_BIT_250_KBAUD	ISO 15765 29 BIT 250 KBAUD	ISO 15765 CAN（29 位 / 250 kbit/s）
-protocol.SAE_J1939_29_BIT_250_KBAUD	SAE J1939 29 BIT 250 KBAUD	SAE J1939（29 位 / 250 kbit/s）
-mqttIdentifier.MAC	MAC	MAC 地址
-mqttIdentifier.MAC_IMEI	MAC IMEI	MAC 地址和 IMEI
-mqttIdentifier.CUSTOM	CUSTOM	自定义
-mqttProtocol.MQTT	MQTT	MQTT
-mqttProtocol.WEBSOCKET	WEBSOCKET	WebSocket
-bluetooth.title	Connect Bluetooth OBD	连接蓝牙 OBD
-bluetooth.summary	Bluetooth OBD	蓝牙 OBD
-bluetooth.choose	Choose device	选择设备
-bluetooth.instructions	Power on or wake your OBD adapter, enter pairing mode if required, and disconnect other diagnostic apps. Scan nearby devices, then choose your adapter.	请给 OBD 适配器通电或将其唤醒，按需进入配对模式，并断开其他诊断应用。扫描附近设备后，选择你的适配器。
-bluetooth.protocolHelp	Uses the Protocol selected on the settings page. Successful connection saves the adapter and returns to the previous page.	使用设置页选定的车辆通信协议。连接成功后保存适配器信息，并返回上一页。
-bluetooth.unsupported	This firmware does not support the Bluetooth connection page.	当前固件不支持蓝牙连接页面。
-bluetooth.scan	Scan nearby Bluetooth	扫描附近的蓝牙设备
-bluetooth.loading	Loading connection status…	正在读取连接状态…
-bluetooth.unnamed	Unnamed device	未命名设备
-bluetooth.advertised	OBD serial service advertised	已广播 OBD 串口服务
-bluetooth.checkOnConnect	Compatibility will be checked on connection	连接时检查兼容性
-bluetooth.connectTo	Connect to {name}	连接到 {name}
-bluetooth.empty	No Bluetooth devices found. Move the adapter closer, check its power, then scan again.	未发现蓝牙设备。请靠近适配器，检查供电后重新扫描。
-bluetooth.unavailable	Connection status unavailable	暂时无法获取连接状态
-bluetooth.pidSupportHelp	Adapter connection does not confirm that vehicle PIDs are supported.	适配器连接成功，不代表车辆支持所配置的 PID。
-bluetooth.loadProtocolFailed	Cannot load Protocol. Return to settings and try again.	无法读取车辆通信协议。请返回设置页重试。
-bluetooth.unreachable	Cannot reach the device. Check the configuration WiFi connection.	无法连接开发板。请检查与设备 Wi-Fi 热点的连接。
-bluetooth.connectFailed	Connection failed. Please retry.	连接失败，请重试。
-bluetooth.scanFailed	Cannot start scan. Bluetooth may be busy; please retry.	无法开始扫描。蓝牙可能正在忙，请稍后重试。
-bluetooth.startFailed	Cannot start connection. Scan again if the list has changed.	无法开始连接。如果设备列表已变化，请重新扫描。
-bluetooth.saveFailed	Could not save the adapter. Please retry.	无法保存适配器信息，请重试。
-ble.state.disabled	OBD connection disabled	OBD 连接已禁用
-ble.state.queued	Waiting for Bluetooth	等待蓝牙操作
-ble.state.scanning	Scanning nearby devices	正在扫描附近设备
-ble.state.scan_complete	Scan complete	扫描完成
-ble.state.connecting	Connecting Bluetooth	正在连接蓝牙
-ble.state.initializing	Bluetooth connected — initializing ELM327	蓝牙已连接，正在初始化 ELM327
-ble.state.connected	Online — ELM327 initialized	在线 · ELM327 已初始化
-ble.state.disconnected	Disconnected	已断开
-ble.state.bluetooth_error	Bluetooth connection failed	蓝牙连接失败
-ble.state.elm_error	ELM327 initialization failed	ELM327 初始化失败
-ble.state.not_found	Configured device not found	未找到已配置的设备
-ble.state.save_error	Could not save connection	无法保存连接配置
-ble.error.none	No error	无错误
-ble.error.ble_init_failed	Bluetooth initialization failed	蓝牙初始化失败
-ble.error.client_allocation_failed	Could not allocate a Bluetooth client	无法分配蓝牙客户端
-ble.error.client_cleanup_failed	Could not release the previous Bluetooth client	无法释放上一次蓝牙连接
-ble.error.link_connect_failed	Could not establish the Bluetooth link	无法建立蓝牙连接
-ble.error.link_disconnected	Bluetooth link disconnected	蓝牙连接已断开
-ble.error.disconnected_during_setup	Bluetooth disconnected during setup	建立连接时蓝牙断开
-ble.error.link_disconnected_during_elm	Bluetooth disconnected during ELM327 initialization	初始化 ELM327 时蓝牙断开
-ble.error.service_not_found	Compatible serial service not found	未找到兼容的串口服务
-ble.error.rx_characteristic_not_found	Receive characteristic not found	未找到接收特征
-ble.error.tx_characteristic_not_found	Transmit characteristic not found	未找到发送特征
-ble.error.tx_not_writable	Transmit characteristic is not writable	发送特征不支持写入
-ble.error.rx_not_subscribable	Receive characteristic cannot be subscribed to	接收特征不支持订阅
-ble.error.subscribe_failed	Could not subscribe to received data	无法订阅接收数据
-ble.error.adapter_not_found	OBD adapter not found	未找到 OBD 适配器
-ble.error.config_save_failed	Could not save the adapter configuration	无法保存适配器配置
-ble.error.out_of_memory	Not enough memory to initialize ELM327	内存不足，无法初始化 ELM327
-ble.error.initialization_failed	ELM327 did not complete initialization	ELM327 初始化未完成
-ble.error.unknown	Bluetooth error: {code}	蓝牙错误：{code}
-ble.elmError	ELM327 initialization failed: {code}	ELM327 初始化失败：{code}
-states.type	Type	数据来源
-states.valueType	Value Type	数值类型
-states.enabled	enabled	启用
-states.visible	visible	发布到 HA
-states.measurement	Measurement	测量值
-states.diagnostic	Diagnostic	诊断项
-states.interval	Interval	更新间隔（毫秒）
-states.name	Name	固定标识
-states.description	Description	显示名称
-states.icon	Icon	图标
-states.deviceClassUnit	Sensor Device Class / Unit	传感器类别 / 单位
-states.unit	Unit	单位
-states.readFunction	Read Function	读取函数
-states.servicePidHeader	Service / PID / Header	服务码 / PID / 请求地址
-states.service	Service	服务码
-states.pid	PID	PID
-states.header	Header	请求地址
-states.responseFields	Responses / Expected Bytes / Response Format	响应数量 / 预期字节数 / 解析格式
-states.responses	Number of Responses	响应数量
-states.expectedBytes	Number of expected Bytes	预期字节数
-states.advanced	Advanced ECU addressing and data field	高级 ECU 寻址与数据字段
-states.advancedHelp	Use the vehicle's verified query settings. Defaults use the connection protocol and automatic reception. Settings are restored after each query.	请使用已在车辆上验证的查询参数。默认沿用连接协议并自动接收，每次查询结束后恢复设置。
-states.queryProtocol	Query protocol	本次查询协议
-states.inheritProtocol	Use connection protocol	沿用连接协议
-states.can6	CAN 11 bit / 500 kbit/s (6)	CAN 11 位 / 500 kbit/s（6）
-states.can7	CAN 29 bit / 500 kbit/s (7)	CAN 29 位 / 500 kbit/s（7）
-states.can8	CAN 11 bit / 250 kbit/s (8)	CAN 11 位 / 250 kbit/s（8）
-states.can9	CAN 29 bit / 250 kbit/s (9)	CAN 29 位 / 250 kbit/s（9）
-states.receiveHeader	Receive header (decimal; 0 = automatic)	接收地址（十进制；0 为自动）
-states.flowControlHeader	Flow-control header (decimal; 0 = automatic)	流控帧发送地址（十进制；0 为自动）
-states.flowControlData	Flow-control data (decimal)	流控数据（十进制）
-states.flowControlExample	3145728 = 0x300000	3145728 = 0x300000
-states.waitAllHelp	CAN queries without a receive filter, and multi-frame values, wait for all replies even when “Specify number of responses” is enabled. Set Responses to 0 to always wait.	未设置接收过滤的 CAN 查询和多帧数据会等待完整响应，即使已启用“指定响应数量”。响应数量设为 0 时，始终等待完整响应。
-states.dataOffset	Data byte offset (0 = first)	数据字节偏移（0 表示第一个字节）
-states.dataLength	Field length (0 = normal decoding)	字段长度（字节；0 为常规解析）
-states.signedValue	Signed field	按有符号数解析
-states.fieldHelp	Offsets start after service/PID bytes. Expected Bytes is the complete data length. A selected field uses Scale factor / Bias and overrides Response Format.	偏移从服务码和 PID 之后的数据部分起算。预期字节数是完整数据长度。选定字段后，使用比例系数和偏置换算，不再采用“解析格式”。
-states.scaleBias	Scale factor / Bias	比例系数 / 偏置
-states.scaleFactor	Scale Factor	比例系数
-states.bias	Bias	偏置
-states.expression	Expression	计算表达式
-states.invalidVariable	Invalid variable:	无效变量：
-states.invalidExtension	Invalid variable extension:	无效变量后缀：
-states.invalidFunction	Invalid function:	无效函数：
-states.formatFunction	Format Function	格式转换函数
-states.formatFields	Format / Format Expression	格式字符串 / 格式化表达式
-states.valueFormat	Value Format	格式字符串
-states.formatExpression	Format Expression	格式化表达式
-states.saved	States updated successfully.	OBD 数据配置已保存。
-states.add	Add data item	添加数据项
-states.remove	Remove data item	移除数据项
-states.switchBase	Switch decimal/hexadecimal	切换十进制 / 十六进制
-validation.wholeNumbers	Query settings must be whole numbers.	查询参数必须为整数。
-validation.canProtocol	Choose an ISO 15765 CAN protocol or the connection protocol.	请选择 ISO 15765 CAN 协议，或沿用连接协议。
-validation.can11Address	An 11-bit CAN address cannot exceed 2047.	11 位 CAN 地址不能超过 2047。
-validation.flowControl	Flow-control data must start with 0x30 and use a valid separation time.	流控数据必须以 0x30 开头，并使用有效的帧间隔参数。
-validation.fieldRequired	Select a field length before using an offset or signed value.	使用字节偏移或有符号数解析前，请先设置字段长度。
-validation.fieldBounds	The selected field exceeds Expected Bytes.	所选字段超出了预期字节数范围。
-stateType.READ	READ	读取车辆数据
-stateType.CALC	CALC	计算数据
-valueType.BOOL	BOOL	布尔值（是 / 否）
-valueType.FLOAT	FLOAT	浮点数
-valueType.INT	INT	整数
-responseFormat.PREDEFINED	PREDEFINED	按预期字节数解析
-responseFormat.INT_8	INT_8	8 位整数
-responseFormat.INT_16	INT_16	16 位整数
-responseFormat.INT_32	INT_32	32 位整数
-responseFormat.INT_64	INT_64	64 位整数
-readFunction.batteryVoltage	Battery Voltage	OBD 适配器供电电压
-formatFunction.toBitStr	Format as Bit String	转换为二进制字符串
-formatFunction.toMiles	Convert km to mi	公里转换为英里
-formatFunction.toGallons	Convert L to gal	升转换为加仑
-formatFunction.toMPG	Convert L/100km to MPG	升 / 百公里转换为英里 / 加仑
-formatFunction.payload	Output raw payload	输出原始响应
-deviceClass.battery	Percentage of battery that is left	电池剩余电量
-deviceClass.current	Current	电流
-deviceClass.distance	Generic distance	距离
-deviceClass.duration	Time period	时长
-deviceClass.energy	Energy	电能
-deviceClass.energy_distance	Energy Distance	单位里程能耗 / 每单位电能行驶距离
-deviceClass.energy_storage	Energy Storage	储能量
-deviceClass.power	Power	功率
-deviceClass.pressure	Pressure	压力
-deviceClass.speed	Generic speed	速度
-deviceClass.temperature	Temperature	温度
-deviceClass.voltage	Voltage	电压
-deviceClass.volume	Generic volume	体积
-deviceClass.volume_storage	Generic stored volume	储存体积
-ota.downloadBeforeLink	Download the latest	下载适用于该设备的最新
-ota.releaseLink	release	发布版本
-ota.downloadAfterLink	for your device.	。
-ota.extractHelp	Extract and upload firmware.bin and/or littlefs.bin, or move the entire folder to the drag and drop zone.	解压后上传 firmware.bin 和 / 或 littlefs.bin，也可以将整个文件夹拖入下方区域。
-ota.stayOnPage	Do not reload this page or switch to another page while the update is in progress!	更新过程中请勿刷新页面或切换到其他页面！
-ota.uploadType	Upload type	上传类型
-ota.selectFiles	Select or drop file/folder	选择或拖入文件 / 文件夹
-ota.mode.FIRMWARE	FIRMWARE	应用固件
-ota.mode.LITTLE_FS	LITTLE FS	LittleFS 文件系统
-ota.writeFailed	Failed to write chunked data to free space	无法将上传的数据块写入可用空间
-ota.errorWithDetail	Update failed: {detail}	更新失败：{detail}
-api.bluetoothBusy	Bluetooth is busy	蓝牙正在忙，请稍后重试。
-api.selectDevice	Select a scanned device and Protocol	请选择扫描到的设备和车辆通信协议。
-api.selectionExpired	Bluetooth is busy or scan selection has expired	蓝牙正在忙，或扫描结果已过期。
-api.configSaving	Configuration is being saved; retry shortly	正在保存配置，请稍后重试。
-api.deviceBusy	Device is busy; retry saving shortly	设备正在忙，请稍后重新保存。
-api.waitBluetooth	Wait for Bluetooth operation to finish	请等待蓝牙操作完成。
-api.waitObd	Wait for the current OBD reply to finish	请等待当前 OBD 查询响应结束。
-templates.title	Vehicle templates	车型模板
+key	en	zh-CN	ja
+app.title	OBD2 to MQTT for Home Assistant	OBD2 转 MQTT · Home Assistant	Home Assistant 向け OBD2 → MQTT
+nav.info	Info	设备信息	機器情報
+nav.settings	Settings	设置	設定
+nav.obd	OBD	OBD 数据	OBD データ
+nav.ota	OTA	固件上传	ファームウェア転送
+common.save	Save	保存	保存
+common.cancel	Cancel	取消	キャンセル
+common.download	Download	下载	ダウンロード
+common.upload	Upload	上传	アップロード
+common.back	Back	返回	戻る
+common.connect	Connect	连接	接続
+common.none	none	无	なし
+common.username	Username	用户名	ユーザー名
+common.password	Password	密码	パスワード
+common.ssid	SSID	热点名称（SSID）	SSID
+common.ip	IP	IP 地址	IP アドレス
+common.mac	MAC	MAC 地址	MAC アドレス
+common.name	Name	名称	名前
+common.version	Version	版本	バージョン
+common.seconds	sec	秒	秒
+common.hex	HEX	十六进制	16進数
+common.decimal	DEC	十进制	10進数
+common.reboot	Reboot	重启设备	機器を再起動
+common.rebootConfirm	Are you sure you want to reboot?	确定要重启设备吗？	機器を再起動しますか？
+common.switchTheme	Switch Color Scheme	切换明暗主题	ライト／ダークモードを切り替え
+common.errorWithDetail	Operation failed: {detail}	操作失败：{detail}	操作に失敗しました：{detail}
+info.firmware	Firmware	固件	ファームウェア
+info.wifi	WiFi Info	Wi-Fi 信息	Wi-Fi 情報
+info.modem	Modem Info	移动通信模块信息	モバイル通信モジュール情報
+info.signalQuality	Signal Quality	信号强度	電波強度
+info.imei	IMEI	设备识别码（IMEI）	端末識別番号（IMEI）
+info.imsi	IMSI	移动用户识别码（IMSI）	加入者識別番号（IMSI）
+info.ccid	CCID	SIM 卡识别码（CCID）	SIM カード識別番号（CCID）
+info.dtcs	Dagnostic Trouble Codes	诊断故障码	診断トラブルコード
+settings.language	Language	语言	言語
+settings.general	General	通用设置	一般設定
+settings.sleepTimeout	Auto sleep timeout (sec)	自动休眠等待时间（秒）	自動スリープまでの待機時間（秒）
+settings.sleepTimeoutPlaceholder	Auto shutdown timeout	自动休眠等待时间	自動スリープまでの待機時間
+settings.sleepDuration	Sleep duration (sec)	休眠时长（秒）	スリープ時間（秒）
+settings.sleepDurationPlaceholder	Sleep duration	休眠时长	スリープ時間
+settings.wifi	WiFi Access Point	Wi-Fi 热点	Wi-Fi アクセスポイント
+settings.mobile	Mobile	移动网络	モバイルネットワーク
+settings.networkMode	Network Mode	网络模式	ネットワークモード
+settings.simPin	Sim PIN	SIM 卡 PIN 码	SIM の PIN コード
+settings.pinPlaceholder	PIN	PIN 码	PIN コード
+settings.apn	Access Point Name	接入点名称（APN）	アクセスポイント名（APN）
+settings.apnPlaceholder	APN	APN	APN
+settings.obd	OBD2/ELM 327 Device	OBD2 / ELM327 适配器	OBD2 / ELM327 アダプター
+settings.disableObd	disable OBD connection	禁用 OBD 连接	OBD 接続を無効にする
+settings.protocol	Protocol	车辆通信协议	車両通信プロトコル
+settings.checkPidSupport	check if PID is supported	检查车辆是否支持 PID	車両の PID 対応状況を確認する
+settings.specifyResponses	Specify number of responses	指定响应数量	応答数を指定する
+settings.debug	Debug Mode	调试模式	デバッグモード
+settings.debugHelp	Include Bluetooth connection and ELM327 traces in USB serial logs. Applies after saving without reconnecting.	在 USB 串口日志中记录蓝牙连接及 ELM327 通信详情。保存后生效，无需重新连接。	Bluetooth 接続と ELM327 通信の詳細を USB シリアルログに記録します。保存後に適用され、再接続は不要です。
+settings.mqtt	MQTT Broker	MQTT 服务器	MQTT ブローカー
+settings.identifierType	Identifier Type	设备标识类型	機器識別子の種類
+settings.identifierSuffix	Identifier Suffix	设备标识后缀	機器識別子の接尾辞
+settings.mqttEndpoint	Protocol/Hostname/Port	传输协议 / 主机地址 / 端口	プロトコル / ホスト名 / ポート
+settings.hostname	Hostname	主机地址	ホスト名
+settings.port	Port	端口	ポート
+settings.tls	use TLS/SSL	使用 TLS/SSL 加密	TLS/SSL 暗号化を使用する
+settings.offlineBehaviour	Offline behaviour	离线时的行为	オフライン時の動作
+settings.allowOffline	Allow offline	允许离线	オフラインを許可する
+settings.sendInterval	Send Interval	上报间隔	送信間隔
+settings.discoveryInterval	Resend Discovery	重新发送 HA 自动发现配置	HA 自動検出設定の再送信
+settings.dataInterval	Data	车辆数据	車両データ
+settings.diagnosticInterval	Diagnostic Data	诊断数据	診断データ
+settings.locationInterval	GSM/GPS Position	移动网络 / GPS 定位	モバイルネットワーク / GPS 位置情報
+settings.saved	Settings updated successfully.	设置已保存。	設定を保存しました。
+network.AUTO	AUTO	自动	自動
+network.GSM	GSM	GSM（2G）	GSM（2G）
+network.WCDMA	WCDMA	WCDMA（3G）	WCDMA（3G）
+network.LTE	LTE	LTE（4G）	LTE（4G）
+network.GSM_LTE	GSM LTE	GSM / LTE	GSM / LTE
+protocol.AUTOMATIC	AUTOMATIC	自动选择	自動選択
+protocol.SAE_J1850_PWM_41_KBAUD	SAE J1850 PWM 41 KBAUD	SAE J1850 PWM（41.6 kbit/s）	SAE J1850 PWM（41.6 kbit/s）
+protocol.SAE_J1850_VPW_10_KBAUD	SAE J1850 VPW 10 KBAUD	SAE J1850 VPW（10.4 kbit/s）	SAE J1850 VPW（10.4 kbit/s）
+protocol.ISO_9141_5_BAUD_INIT	ISO 9141 5 BAUD INIT	ISO 9141（5 波特初始化）	ISO 9141（5ボー初期化）
+protocol.ISO_14230_5_BAUD_INIT	ISO 14230 5 BAUD INIT	ISO 14230（5 波特初始化）	ISO 14230（5ボー初期化）
+protocol.ISO_14230_FAST_INIT	ISO 14230 FAST INIT	ISO 14230（快速初始化）	ISO 14230（高速初期化）
+protocol.ISO_15765_11_BIT_500_KBAUD	ISO 15765 11 BIT 500 KBAUD	ISO 15765 CAN（11 位 / 500 kbit/s）	ISO 15765 CAN（11ビット / 500 kbit/s）
+protocol.ISO_15765_29_BIT_500_KBAUD	ISO 15765 29 BIT 500 KBAUD	ISO 15765 CAN（29 位 / 500 kbit/s）	ISO 15765 CAN（29ビット / 500 kbit/s）
+protocol.ISO_15765_11_BIT_250_KBAUD	ISO 15765 11 BIT 250 KBAUD	ISO 15765 CAN（11 位 / 250 kbit/s）	ISO 15765 CAN（11ビット / 250 kbit/s）
+protocol.ISO_15765_29_BIT_250_KBAUD	ISO 15765 29 BIT 250 KBAUD	ISO 15765 CAN（29 位 / 250 kbit/s）	ISO 15765 CAN（29ビット / 250 kbit/s）
+protocol.SAE_J1939_29_BIT_250_KBAUD	SAE J1939 29 BIT 250 KBAUD	SAE J1939（29 位 / 250 kbit/s）	SAE J1939（29ビット / 250 kbit/s）
+mqttIdentifier.MAC	MAC	MAC 地址	MAC アドレス
+mqttIdentifier.MAC_IMEI	MAC IMEI	MAC 地址和 IMEI	MAC アドレスと IMEI
+mqttIdentifier.CUSTOM	CUSTOM	自定义	カスタム
+mqttProtocol.MQTT	MQTT	MQTT	MQTT
+mqttProtocol.WEBSOCKET	WEBSOCKET	WebSocket	WebSocket
+bluetooth.title	Connect Bluetooth OBD	连接蓝牙 OBD	Bluetooth OBD に接続
+bluetooth.summary	Bluetooth OBD	蓝牙 OBD	Bluetooth OBD
+bluetooth.choose	Choose device	选择设备	機器を選択
+bluetooth.instructions	Power on or wake your OBD adapter, enter pairing mode if required, and disconnect other diagnostic apps. Scan nearby devices, then choose your adapter.	请给 OBD 适配器通电或将其唤醒，按需进入配对模式，并断开其他诊断应用。扫描附近设备后，选择你的适配器。	OBD アダプターの電源を入れるかスリープを解除し、必要に応じてペアリングモードにしてください。他の診断アプリとの接続を切断してから周辺機器をスキャンし、アダプターを選択してください。
+bluetooth.protocolHelp	Uses the Protocol selected on the settings page. Successful connection saves the adapter and returns to the previous page.	使用设置页选定的车辆通信协议。连接成功后保存适配器信息，并返回上一页。	設定ページで選択した車両通信プロトコルを使用します。接続に成功するとアダプター情報を保存し、前のページに戻ります。
+bluetooth.unsupported	This firmware does not support the Bluetooth connection page.	当前固件不支持蓝牙连接页面。	このファームウェアは Bluetooth 接続ページに対応していません。
+bluetooth.scan	Scan nearby Bluetooth	扫描附近的蓝牙设备	周辺の Bluetooth 機器をスキャン
+bluetooth.loading	Loading connection status…	正在读取连接状态…	接続状態を取得しています…
+bluetooth.unnamed	Unnamed device	未命名设备	名前のない機器
+bluetooth.advertised	OBD serial service advertised	已广播 OBD 串口服务	OBD シリアルサービスを検出
+bluetooth.checkOnConnect	Compatibility will be checked on connection	连接时检查兼容性	接続時に互換性を確認します
+bluetooth.connectTo	Connect to {name}	连接到 {name}	{name} に接続
+bluetooth.empty	No Bluetooth devices found. Move the adapter closer, check its power, then scan again.	未发现蓝牙设备。请靠近适配器，检查供电后重新扫描。	Bluetooth 機器が見つかりません。アダプターに近づき、電源を確認してから再スキャンしてください。
+bluetooth.unavailable	Connection status unavailable	暂时无法获取连接状态	接続状態を取得できません
+bluetooth.pidSupportHelp	Adapter connection does not confirm that vehicle PIDs are supported.	适配器连接成功，不代表车辆支持所配置的 PID。	アダプターへの接続に成功しても、車両が設定された PID に対応しているとは限りません。
+bluetooth.loadProtocolFailed	Cannot load Protocol. Return to settings and try again.	无法读取车辆通信协议。请返回设置页重试。	車両通信プロトコルを取得できません。設定ページに戻って再試行してください。
+bluetooth.unreachable	Cannot reach the device. Check the configuration WiFi connection.	无法连接开发板。请检查与设备 Wi-Fi 热点的连接。	開発ボードに接続できません。機器の Wi-Fi アクセスポイントへの接続を確認してください。
+bluetooth.connectFailed	Connection failed. Please retry.	连接失败，请重试。	接続に失敗しました。再試行してください。
+bluetooth.scanFailed	Cannot start scan. Bluetooth may be busy; please retry.	无法开始扫描。蓝牙可能正在忙，请稍后重试。	スキャンを開始できません。Bluetooth が使用中の可能性があります。しばらく待って再試行してください。
+bluetooth.startFailed	Cannot start connection. Scan again if the list has changed.	无法开始连接。如果设备列表已变化，请重新扫描。	接続を開始できません。機器一覧が変わった場合は再スキャンしてください。
+bluetooth.saveFailed	Could not save the adapter. Please retry.	无法保存适配器信息，请重试。	アダプター情報を保存できません。再試行してください。
+ble.state.disabled	OBD connection disabled	OBD 连接已禁用	OBD 接続は無効です
+ble.state.queued	Waiting for Bluetooth	等待蓝牙操作	Bluetooth 操作待ち
+ble.state.scanning	Scanning nearby devices	正在扫描附近设备	周辺機器をスキャン中
+ble.state.scan_complete	Scan complete	扫描完成	スキャン完了
+ble.state.connecting	Connecting Bluetooth	正在连接蓝牙	Bluetooth に接続中
+ble.state.initializing	Bluetooth connected — initializing ELM327	蓝牙已连接，正在初始化 ELM327	Bluetooth 接続済み・ELM327 初期化中
+ble.state.connected	Online — ELM327 initialized	在线 · ELM327 已初始化	オンライン・ELM327 初期化済み
+ble.state.disconnected	Disconnected	已断开	未接続
+ble.state.bluetooth_error	Bluetooth connection failed	蓝牙连接失败	Bluetooth 接続に失敗しました
+ble.state.elm_error	ELM327 initialization failed	ELM327 初始化失败	ELM327 の初期化に失敗しました
+ble.state.not_found	Configured device not found	未找到已配置的设备	設定された機器が見つかりません
+ble.state.save_error	Could not save connection	无法保存连接配置	接続設定を保存できません
+ble.error.none	No error	无错误	エラーなし
+ble.error.ble_init_failed	Bluetooth initialization failed	蓝牙初始化失败	Bluetooth の初期化に失敗しました
+ble.error.client_allocation_failed	Could not allocate a Bluetooth client	无法分配蓝牙客户端	Bluetooth クライアントを確保できません
+ble.error.client_cleanup_failed	Could not release the previous Bluetooth client	无法释放上一次蓝牙连接	前回の Bluetooth クライアントを解放できません
+ble.error.link_connect_failed	Could not establish the Bluetooth link	无法建立蓝牙连接	Bluetooth 接続を確立できません
+ble.error.link_disconnected	Bluetooth link disconnected	蓝牙连接已断开	Bluetooth 接続が切断されました
+ble.error.disconnected_during_setup	Bluetooth disconnected during setup	建立连接时蓝牙断开	接続の設定中に Bluetooth が切断されました
+ble.error.link_disconnected_during_elm	Bluetooth disconnected during ELM327 initialization	初始化 ELM327 时蓝牙断开	ELM327 の初期化中に Bluetooth が切断されました
+ble.error.service_not_found	Compatible serial service not found	未找到兼容的串口服务	対応するシリアルサービスが見つかりません
+ble.error.rx_characteristic_not_found	Receive characteristic not found	未找到接收特征	受信用キャラクタリスティックが見つかりません
+ble.error.tx_characteristic_not_found	Transmit characteristic not found	未找到发送特征	送信用キャラクタリスティックが見つかりません
+ble.error.tx_not_writable	Transmit characteristic is not writable	发送特征不支持写入	送信用キャラクタリスティックに書き込めません
+ble.error.rx_not_subscribable	Receive characteristic cannot be subscribed to	接收特征不支持订阅	受信用キャラクタリスティックの通知を購読できません
+ble.error.subscribe_failed	Could not subscribe to received data	无法订阅接收数据	受信データの通知を購読できません
+ble.error.adapter_not_found	OBD adapter not found	未找到 OBD 适配器	OBD アダプターが見つかりません
+ble.error.config_save_failed	Could not save the adapter configuration	无法保存适配器配置	アダプターの設定を保存できません
+ble.error.out_of_memory	Not enough memory to initialize ELM327	内存不足，无法初始化 ELM327	メモリー不足のため ELM327 を初期化できません
+ble.error.initialization_failed	ELM327 did not complete initialization	ELM327 初始化未完成	ELM327 の初期化が完了しませんでした
+ble.error.unknown	Bluetooth error: {code}	蓝牙错误：{code}	Bluetooth エラー：{code}
+ble.elmError	ELM327 initialization failed: {code}	ELM327 初始化失败：{code}	ELM327 の初期化に失敗しました：{code}
+states.type	Type	数据来源	データの取得方法
+states.valueType	Value Type	数值类型	値の型
+states.enabled	enabled	启用	有効
+states.visible	visible	发布到 HA	HA に公開
+states.measurement	Measurement	测量值	測定値
+states.diagnostic	Diagnostic	诊断项	診断項目
+states.interval	Interval	更新间隔（毫秒）	更新間隔（ミリ秒）
+states.name	Name	固定标识	固定識別子
+states.description	Description	显示名称	表示名
+states.icon	Icon	图标	アイコン
+states.deviceClassUnit	Sensor Device Class / Unit	传感器类别 / 单位	センサーのデバイスクラス / 単位
+states.unit	Unit	单位	単位
+states.readFunction	Read Function	读取函数	読み取り関数
+states.servicePidHeader	Service / PID / Header	服务码 / PID / 请求地址	サービス / PID / 要求ヘッダー
+states.service	Service	服务码	サービス
+states.pid	PID	PID	PID
+states.header	Header	请求地址	要求ヘッダー
+states.responseFields	Responses / Expected Bytes / Response Format	响应数量 / 预期字节数 / 解析格式	応答数 / 想定バイト数 / 応答形式
+states.responses	Number of Responses	响应数量	応答数
+states.expectedBytes	Number of expected Bytes	预期字节数	想定バイト数
+states.advanced	Advanced ECU addressing and data field	高级 ECU 寻址与数据字段	ECU アドレスとデータフィールドの詳細設定
+states.advancedHelp	Use the vehicle's verified query settings. Defaults use the connection protocol and automatic reception. Settings are restored after each query.	请使用已在车辆上验证的查询参数。默认沿用连接协议并自动接收，每次查询结束后恢复设置。	車両で検証済みの照会設定を使用してください。既定では接続時のプロトコルと自動受信を使用し、各照会の終了後に設定を元に戻します。
+states.queryProtocol	Query protocol	本次查询协议	照会プロトコル
+states.inheritProtocol	Use connection protocol	沿用连接协议	接続時のプロトコルを使用
+states.can6	CAN 11 bit / 500 kbit/s (6)	CAN 11 位 / 500 kbit/s（6）	CAN 11ビット / 500 kbit/s（6）
+states.can7	CAN 29 bit / 500 kbit/s (7)	CAN 29 位 / 500 kbit/s（7）	CAN 29ビット / 500 kbit/s（7）
+states.can8	CAN 11 bit / 250 kbit/s (8)	CAN 11 位 / 250 kbit/s（8）	CAN 11ビット / 250 kbit/s（8）
+states.can9	CAN 29 bit / 250 kbit/s (9)	CAN 29 位 / 250 kbit/s（9）	CAN 29ビット / 250 kbit/s（9）
+states.receiveHeader	Receive header (decimal; 0 = automatic)	接收地址（十进制；0 为自动）	受信ヘッダー（10進数、0＝自動）
+states.flowControlHeader	Flow-control header (decimal; 0 = automatic)	流控帧发送地址（十进制；0 为自动）	フロー制御ヘッダー（10進数、0＝自動）
+states.flowControlData	Flow-control data (decimal)	流控数据（十进制）	フロー制御データ（10進数）
+states.flowControlExample	3145728 = 0x300000	3145728 = 0x300000	3145728 = 0x300000
+states.waitAllHelp	CAN queries without a receive filter, and multi-frame values, wait for all replies even when “Specify number of responses” is enabled. Set Responses to 0 to always wait.	未设置接收过滤的 CAN 查询和多帧数据会等待完整响应，即使已启用“指定响应数量”。响应数量设为 0 时，始终等待完整响应。	受信フィルターを設定していない CAN 照会と複数フレームの値は、「応答数を指定する」が有効でもすべての応答を待ちます。応答数を 0 にすると常にすべての応答を待ちます。
+states.dataOffset	Data byte offset (0 = first)	数据字节偏移（0 表示第一个字节）	データのバイトオフセット（0＝先頭）
+states.dataLength	Field length (0 = normal decoding)	字段长度（字节；0 为常规解析）	フィールド長（バイト、0＝通常の解析）
+states.signedValue	Signed field	按有符号数解析	符号付き数値として解析
+states.fieldHelp	Offsets start after service/PID bytes. Expected Bytes is the complete data length. A selected field uses Scale factor / Bias and overrides Response Format.	偏移从服务码和 PID 之后的数据部分起算。预期字节数是完整数据长度。选定字段后，使用比例系数和偏置换算，不再采用“解析格式”。	オフセットはサービスと PID の後のデータ部分から数えます。想定バイト数はデータ全体の長さです。フィールドを選択すると応答形式の設定に代わり、倍率とオフセット値で換算します。
+states.scaleBias	Scale factor / Bias	比例系数 / 偏置	倍率 / オフセット値
+states.scaleFactor	Scale Factor	比例系数	倍率
+states.bias	Bias	偏置	オフセット値
+states.expression	Expression	计算表达式	計算式
+states.invalidVariable	Invalid variable:	无效变量：	無効な変数：
+states.invalidExtension	Invalid variable extension:	无效变量后缀：	無効な変数の接尾辞：
+states.invalidFunction	Invalid function:	无效函数：	無効な関数：
+states.formatFunction	Format Function	格式转换函数	書式変換関数
+states.formatFields	Format / Format Expression	格式字符串 / 格式化表达式	書式文字列 / 書式設定式
+states.valueFormat	Value Format	格式字符串	書式文字列
+states.formatExpression	Format Expression	格式化表达式	書式設定式
+states.saved	States updated successfully.	OBD 数据配置已保存。	OBD データ設定を保存しました。
+states.add	Add data item	添加数据项	データ項目を追加
+states.remove	Remove data item	移除数据项	データ項目を削除
+states.switchBase	Switch decimal/hexadecimal	切换十进制 / 十六进制	10進数／16進数を切り替え
+validation.wholeNumbers	Query settings must be whole numbers.	查询参数必须为整数。	照会パラメーターは整数で指定してください。
+validation.canProtocol	Choose an ISO 15765 CAN protocol or the connection protocol.	请选择 ISO 15765 CAN 协议，或沿用连接协议。	ISO 15765 CAN プロトコルを選択するか、接続時のプロトコルを使用してください。
+validation.can11Address	An 11-bit CAN address cannot exceed 2047.	11 位 CAN 地址不能超过 2047。	11ビット CAN アドレスは 2047 以下にしてください。
+validation.flowControl	Flow-control data must start with 0x30 and use a valid separation time.	流控数据必须以 0x30 开头，并使用有效的帧间隔参数。	フロー制御データは 0x30 で始め、有効なフレーム間隔を指定してください。
+validation.fieldRequired	Select a field length before using an offset or signed value.	使用字节偏移或有符号数解析前，请先设置字段长度。	オフセットや符号付き解析を使用する前に、フィールド長を設定してください。
+validation.fieldBounds	The selected field exceeds Expected Bytes.	所选字段超出了预期字节数范围。	選択したフィールドが想定バイト数を超えています。
+stateType.READ	READ	读取车辆数据	車両データを読み取り
+stateType.CALC	CALC	计算数据	計算値
+valueType.BOOL	BOOL	布尔值（是 / 否）	真偽値
+valueType.FLOAT	FLOAT	浮点数	浮動小数点数
+valueType.INT	INT	整数	整数
+responseFormat.PREDEFINED	PREDEFINED	按预期字节数解析	想定バイト数に基づいて解析
+responseFormat.INT_8	INT_8	8 位整数	8ビット整数
+responseFormat.INT_16	INT_16	16 位整数	16ビット整数
+responseFormat.INT_32	INT_32	32 位整数	32ビット整数
+responseFormat.INT_64	INT_64	64 位整数	64ビット整数
+readFunction.batteryVoltage	Battery Voltage	OBD 适配器供电电压	OBD アダプターの供給電圧
+formatFunction.toBitStr	Format as Bit String	转换为二进制字符串	2進数文字列に変換
+formatFunction.toMiles	Convert km to mi	公里转换为英里	km を mi に変換
+formatFunction.toGallons	Convert L to gal	升转换为加仑	L を gal に変換
+formatFunction.toMPG	Convert L/100km to MPG	升 / 百公里转换为英里 / 加仑	L/100km を MPG に変換
+formatFunction.payload	Output raw payload	输出原始响应	生の応答データを出力
+deviceClass.battery	Percentage of battery that is left	电池剩余电量	バッテリー残量
+deviceClass.current	Current	电流	電流
+deviceClass.distance	Generic distance	距离	距離
+deviceClass.duration	Time period	时长	時間
+deviceClass.energy	Energy	电能	電力量
+deviceClass.energy_distance	Energy Distance	单位里程能耗 / 每单位电能行驶距离	単位距離あたりの電力量／単位電力量あたりの距離
+deviceClass.energy_storage	Energy Storage	储能量	蓄電量
+deviceClass.power	Power	功率	電力
+deviceClass.pressure	Pressure	压力	圧力
+deviceClass.speed	Generic speed	速度	速度
+deviceClass.temperature	Temperature	温度	温度
+deviceClass.voltage	Voltage	电压	電圧
+deviceClass.volume	Generic volume	体积	体積
+deviceClass.volume_storage	Generic stored volume	储存体积	貯蔵量（体積）
+ota.downloadBeforeLink	Download the latest	下载适用于该设备的最新	お使いの機器に対応した最新の
+ota.releaseLink	release	发布版本	リリース
+ota.downloadAfterLink	for your device.	。	をダウンロードしてください。
+ota.extractHelp	Extract and upload firmware.bin and/or littlefs.bin, or move the entire folder to the drag and drop zone.	解压后上传 firmware.bin 和 / 或 littlefs.bin，也可以将整个文件夹拖入下方区域。	解凍後に firmware.bin と littlefs.bin のいずれか、または両方をアップロードしてください。フォルダー全体を下の領域にドラッグ＆ドロップすることもできます。
+ota.stayOnPage	Do not reload this page or switch to another page while the update is in progress!	更新过程中请勿刷新页面或切换到其他页面！	更新中はページを再読み込みしたり、別のページに移動したりしないでください！
+ota.uploadType	Upload type	上传类型	アップロードの種類
+ota.selectFiles	Select or drop file/folder	选择或拖入文件 / 文件夹	ファイル／フォルダーを選択またはドロップ
+ota.mode.FIRMWARE	FIRMWARE	应用固件	アプリケーションファームウェア
+ota.mode.LITTLE_FS	LITTLE FS	LittleFS 文件系统	LittleFS ファイルシステム
+ota.writeFailed	Failed to write chunked data to free space	无法将上传的数据块写入可用空间	アップロードしたデータを空き領域に書き込めません
+ota.errorWithDetail	Update failed: {detail}	更新失败：{detail}	更新に失敗しました：{detail}
+api.bluetoothBusy	Bluetooth is busy	蓝牙正在忙，请稍后重试。	Bluetooth が使用中です。しばらく待って再試行してください。
+api.selectDevice	Select a scanned device and Protocol	请选择扫描到的设备和车辆通信协议。	スキャンした機器と車両通信プロトコルを選択してください。
+api.selectionExpired	Bluetooth is busy or scan selection has expired	蓝牙正在忙，或扫描结果已过期。	Bluetooth が使用中か、スキャン結果の有効期限が切れています。
+api.configSaving	Configuration is being saved; retry shortly	正在保存配置，请稍后重试。	設定を保存しています。しばらく待って再試行してください。
+api.deviceBusy	Device is busy; retry saving shortly	设备正在忙，请稍后重新保存。	機器が使用中です。しばらく待ってから保存し直してください。
+api.waitBluetooth	Wait for Bluetooth operation to finish	请等待蓝牙操作完成。	Bluetooth の操作が完了するまでお待ちください。
+api.waitObd	Wait for the current OBD reply to finish	请等待当前 OBD 查询响应结束。	現在の OBD 照会の応答が完了するまでお待ちください。
+templates.title	Vehicle templates	车型模板	車種別テンプレート
+resources.title	Language & templates	语言与模板	言語とテンプレート
+resources.help	Downloads use the device's mobile network. Saved languages work offline. Your current vehicle configuration is kept until you apply a template.	下载使用设备的移动网络，已保存的语言可离线使用。应用模板前，当前车辆配置保持不变。	ダウンロードには機器のモバイルネットワークを使用します。保存した言語はオフラインでも使えます。テンプレートを適用するまで現在の車両設定は変わりません。
+resources.source	Download source	下载源	ダウンロード元
+resources.auto	Automatic (Gitee first, GitHub fallback)	自动（优先 Gitee，失败后尝试 GitHub）	自動（Gitee を優先、失敗時は GitHub）
+resources.gitee	Gitee	Gitee	Gitee
+resources.github	GitHub	GitHub	GitHub
+resources.refresh	Refresh online catalogs	刷新在线目录	オンラインカタログを更新
+resources.working	Downloading and verifying. Please wait…	正在下载并校验，请稍候…	ダウンロードして検証しています。しばらくお待ちください…
+resources.failed	Operation failed. Previous settings are kept. Error:	操作失败，原有设置已保留。错误：	操作に失敗しました。元の設定は保持されています。エラー：
+resources.refreshed	Online catalogs updated.	在线目录已更新。	オンラインカタログを更新しました。
+resources.languageApplied	Language applied and saved on the device.	语言已应用并保存到设备。	言語を適用し、機器に保存しました。
+resources.useLanguage	Use language	应用语言	言語を適用
+resources.builtins	Built-in test templates	内置测试模板	内蔵テスト用テンプレート
+resources.vehicleScope	The petrol example requires standard OBD PID support. The ID.4 example was verified on one vehicle and is not a universal EV profile.	燃油车示例需要车辆支持对应的标准 OBD PID。ID.4 示例已在本车验证，不适用于所有电动车。	ガソリン車の例には、該当する標準 OBD PID への対応が必要です。ID.4 の例は 1 台の車両で検証済みですが、すべての電気自動車に対応するものではありません。
+resources.petrol	Petrol · basic OBD test	燃油车 · 基础 OBD 测试	ガソリン車・基本 OBD テスト
+resources.id4	Volkswagen ID.4 · four verified readings	大众 ID.4 · 四项已验证数据	Volkswagen ID.4・検証済みの 4 項目
+resources.loadCatalog	Refresh the online catalogs to see available vehicle templates.	刷新在线目录后，可查看可用的车型模板。	オンラインカタログを更新すると、利用可能な車種別テンプレートが表示されます。
+resources.preview	Preview	预览	プレビュー
+resources.previewHelp	Downloading or previewing does not change the active queries. Applying replaces the full OBD data list; export your current list first.	下载和预览不会改变当前查询。应用模板会替换整个 OBD 数据列表，请先导出当前配置。	ダウンロードやプレビューでは実行中の照会は変わりません。適用すると OBD データ一覧全体が置き換わるため、先に現在の設定をエクスポートしてください。
+resources.apply	Apply template	应用模板	テンプレートを適用
+resources.replaceConfirm	Replace the entire OBD data list with this template? A backup download will be requested before saving.	确定用此模板替换整个 OBD 数据列表吗？保存前会先下载当前配置的备份。	OBD データ一覧全体をこのテンプレートで置き換えますか？保存前に現在の設定のバックアップダウンロードを開始します。
+resources.applied	Template applied. You can customize its items on the OBD page.	模板已应用，可前往 OBD 数据页自定义各项参数。	テンプレートを適用しました。OBD データページで各項目をカスタマイズできます。
+resources.updateLanguage	Update language pack online	在线更新语言包	言語パックをオンラインで更新

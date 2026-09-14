@@ -1,0 +1,138 @@
+[
+  {
+    "type": 0,
+    "valueType": "float",
+    "enabled": true,
+    "visible": true,
+    "interval": 2000,
+    "name": "batterySocObd",
+    "description": "バッテリー残量（OBD）",
+    "icon": "battery",
+    "unit": "%",
+    "deviceClass": "battery",
+    "measurement": true,
+    "diagnostic": false,
+    "pid": {
+      "service": 1,
+      "pid": 91,
+      "header": 417018865,
+      "protocol": 7,
+      "receiveHeader": 417001733,
+      "flowControlHeader": 0,
+      "flowControlData": 3145728,
+      "numResponses": 0,
+      "numExpectedBytes": 1,
+      "responseFormat": 0,
+      "scaleFactor": "100.0 / 255.0",
+      "bias": 0,
+      "dataOffset": 0,
+      "dataLength": 0,
+      "signedValue": false
+    },
+    "value": {
+      "format": "%3.2f"
+    }
+  },
+  {
+    "type": 0,
+    "valueType": "float",
+    "enabled": true,
+    "visible": true,
+    "interval": 1000,
+    "name": "batteryCurrent",
+    "description": "バッテリー電流",
+    "icon": "battery",
+    "unit": "A",
+    "deviceClass": "current",
+    "measurement": true,
+    "diagnostic": false,
+    "pid": {
+      "service": 1,
+      "pid": 154,
+      "header": 417018865,
+      "protocol": 7,
+      "receiveHeader": 417001733,
+      "flowControlHeader": 0,
+      "flowControlData": 3145728,
+      "numResponses": 0,
+      "numExpectedBytes": 6,
+      "responseFormat": 0,
+      "scaleFactor": "0.1",
+      "bias": 0,
+      "dataOffset": 4,
+      "dataLength": 2,
+      "signedValue": true
+    },
+    "value": {
+      "format": "%3.1f"
+    }
+  },
+  {
+    "type": 0,
+    "valueType": "float",
+    "enabled": true,
+    "visible": true,
+    "interval": 3000,
+    "name": "batterySoc",
+    "description": "バッテリー残量（UDS）",
+    "icon": "battery",
+    "unit": "%",
+    "deviceClass": "battery",
+    "measurement": true,
+    "diagnostic": false,
+    "pid": {
+      "service": 34,
+      "pid": 652,
+      "header": 402391163,
+      "protocol": 7,
+      "receiveHeader": 402522235,
+      "flowControlHeader": 402391163,
+      "flowControlData": 3145728,
+      "numResponses": 0,
+      "numExpectedBytes": 1,
+      "responseFormat": 0,
+      "scaleFactor": "1.0 / 2.5",
+      "bias": 0,
+      "dataOffset": 0,
+      "dataLength": 0,
+      "signedValue": false
+    },
+    "value": {
+      "format": "%3.2f"
+    }
+  },
+  {
+    "type": 0,
+    "valueType": "float",
+    "enabled": true,
+    "visible": true,
+    "interval": 3000,
+    "name": "hvBatteryVoltage",
+    "description": "駆動用バッテリー電圧",
+    "icon": "battery",
+    "unit": "V",
+    "deviceClass": "voltage",
+    "measurement": true,
+    "diagnostic": false,
+    "pid": {
+      "service": 34,
+      "pid": 7739,
+      "header": 402391163,
+      "protocol": 7,
+      "receiveHeader": 402522235,
+      "flowControlHeader": 402391163,
+      "flowControlData": 3145728,
+      "numResponses": 0,
+      "numExpectedBytes": 2,
+      "responseFormat": 0,
+      "scaleFactor": "1.0 / 4.0",
+      "bias": 0,
+      "dataOffset": 0,
+      "dataLength": 0,
+      "signedValue": false
+    },
+    "value": {
+      "format": "%3.1f"
+    }
+  }
+]

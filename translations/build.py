@@ -10,8 +10,8 @@ from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parent
 PROJECT = ROOT.parent
-LOCALES = {'en': 'English', 'zh-CN': '简体中文'}
-VERSION = '1.0.0'
+LOCALES = {'en': 'English', 'zh-CN': '简体中文', 'ja': '日本語'}
+VERSION = '1.0.2'
 
 
 def norm(value):
@@ -35,7 +35,8 @@ for row in rows:
         assert row[locale].strip(), f'Empty translation: {row["key"]}'
         assert '<script' not in row[locale].lower()
     placeholders = lambda text: sorted(re.findall(r'\{[A-Za-z][A-Za-z0-9_]*\}', text))
-    assert placeholders(row['en']) == placeholders(row['zh-CN']), row['key']
+    for locale in LOCALES:
+        assert placeholders(row['en']) == placeholders(row[locale]), (row['key'], locale)
 
 messages = {r['key']: r['en'] for r in rows}
 english = {norm(v) for v in messages.values()}
@@ -113,7 +114,7 @@ for code in error_codes:
     assert 'ble.error.' + code in messages, code
 
 catalog = {'schemaVersion': 1, 'version': VERSION, 'uiSchemaVersion': 1,
-           'fallback': 'en', 'integrationStatus': 'pending', 'languages': []}
+           'fallback': 'en', 'integrationStatus': 'integrated', 'languages': []}
 for locale, name in LOCALES.items():
     pack = {'schemaVersion': 1, 'version': VERSION, 'uiSchemaVersion': 1,
             'locale': locale, 'name': name, 'status': 'translated',
