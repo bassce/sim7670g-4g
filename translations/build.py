@@ -11,7 +11,7 @@ from html.parser import HTMLParser
 ROOT = Path(__file__).resolve().parent
 PROJECT = ROOT.parent
 LOCALES = {'en': 'English', 'zh-CN': '简体中文', 'ja': '日本語'}
-VERSION = '1.0.2'
+VERSION = '1.1.0'
 
 
 def norm(value):

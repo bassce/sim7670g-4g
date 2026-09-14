@@ -248,9 +248,9 @@ api.configSaving	Configuration is being saved; retry shortly	正在保存配置�
 api.deviceBusy	Device is busy; retry saving shortly	设备正在忙，请稍后重新保存。	機器が使用中です。しばらく待ってから保存し直してください。
 api.waitBluetooth	Wait for Bluetooth operation to finish	请等待蓝牙操作完成。	Bluetooth の操作が完了するまでお待ちください。
 api.waitObd	Wait for the current OBD reply to finish	请等待当前 OBD 查询响应结束。	現在の OBD 照会の応答が完了するまでお待ちください。
-templates.title	Vehicle templates	车型模板	車種別テンプレート
+templates.title	Online templates	在线模板	オンラインテンプレート
 resources.title	Language & templates	语言与模板	言語とテンプレート
-resources.help	Downloads use the device's mobile network. Saved languages work offline. Your current vehicle configuration is kept until you apply a template.	下载使用设备的移动网络，已保存的语言可离线使用。应用模板前，当前车辆配置保持不变。	ダウンロードには機器のモバイルネットワークを使用します。保存した言語はオフラインでも使えます。テンプレートを適用するまで現在の車両設定は変わりません。
+resources.help	Downloads use the device mobile network. Cached resources work offline. Updating a template does not change your queries until you apply it.	下载使用设备的移动网络，缓存资源可离线使用。在线更新模板后，点击应用才会替换当前查询配置。	ダウンロードには端末のモバイル回線を使用します。保存済みのリソースはオフラインでも利用できます。テンプレート更新後、適用するまで現在の設定は変わりません。
 resources.source	Download source	下载源	ダウンロード元
 resources.auto	Automatic (Gitee first, GitHub fallback)	自动（优先 Gitee，失败后尝试 GitHub）	自動（Gitee を優先、失敗時は GitHub）
 resources.gitee	Gitee	Gitee	Gitee
@@ -268,7 +268,47 @@ resources.id4	Volkswagen ID.4 · four verified readings	大众 ID.4 · 四项已
 resources.loadCatalog	Refresh the online catalogs to see available vehicle templates.	刷新在线目录后，可查看可用的车型模板。	オンラインカタログを更新すると、利用可能な車種別テンプレートが表示されます。
 resources.preview	Preview	预览	プレビュー
 resources.previewHelp	Downloading or previewing does not change the active queries. Applying replaces the full OBD data list; export your current list first.	下载和预览不会改变当前查询。应用模板会替换整个 OBD 数据列表，请先导出当前配置。	ダウンロードやプレビューでは実行中の照会は変わりません。適用すると OBD データ一覧全体が置き換わるため、先に現在の設定をエクスポートしてください。
-resources.apply	Apply template	应用模板	テンプレートを適用
+resources.apply	Apply	应用	適用
 resources.replaceConfirm	Replace the entire OBD data list with this template? A backup download will be requested before saving.	确定用此模板替换整个 OBD 数据列表吗？保存前会先下载当前配置的备份。	OBD データ一覧全体をこのテンプレートで置き換えますか？保存前に現在の設定のバックアップダウンロードを開始します。
 resources.applied	Template applied. You can customize its items on the OBD page.	模板已应用，可前往 OBD 数据页自定义各项参数。	テンプレートを適用しました。OBD データページで各項目をカスタマイズできます。
 resources.updateLanguage	Update language pack online	在线更新语言包	言語パックをオンラインで更新
+resources.refreshing	Fetching language and vehicle template lists…	正在获取语言和车型模板列表…	言語と車種別テンプレートの一覧を取得しています…
+resources.requestTimeout	The device did not acknowledge the request in time. A download may already be running; do not submit it repeatedly.	设备未及时确认请求，后台可能已开始下载，请勿反复提交。	機器から時間内に応答がありませんでした。ダウンロードが始まっている可能性があるため、繰り返し送信しないでください。
+resources.statusUnavailable	Cannot read device progress after several attempts. Check the Wi-Fi connection; the background download may still be running.	多次尝试仍无法读取设备进度。请检查 Wi-Fi 连接，后台下载可能仍在进行。	複数回試しても機器の進捗を取得できません。Wi-Fi 接続を確認してください。バックグラウンドのダウンロードは続いている可能性があります。
+resources.downloadTimeout	The device has not reported completion within the allowed time. Check the download status before trying again.	设备未在规定时间内报告完成，请确认下载状态后再重试。	規定時間内に機器から完了通知がありませんでした。ダウンロード状態を確認してから再試行してください。
+download_failed	The device could not download the resource. See the failure details below.	设备下载资源失败，请查看下方的失败详情。	機器がリソースをダウンロードできませんでした。下の詳細をご確認ください。
+network_unavailable	The mobile network is unavailable.	移动网络尚未就绪。	モバイルネットワークを利用できません。
+clock_unavailable	Network time is unavailable; HTTPS certificate dates cannot be checked.	无法获取网络时间，暂不能校验 HTTPS 证书有效期。	ネットワーク時刻を取得できず、HTTPS 証明書の有効期間を確認できません。
+invalid_catalog	The online catalog is invalid.	在线目录格式无效。	オンラインカタログの形式が無効です。
+storage_failed	The device could not save the resource.	设备无法保存资源文件。	機器にリソースを保存できません。
+not_found	This resource is not in the selected catalog.	所选目录中没有该资源。	選択したカタログにこのリソースがありません。
+invalid_file	The resource file is invalid.	资源文件格式无效。	リソースファイルの形式が無効です。
+incompatible_language	The language pack is incompatible with this interface.	语言包与当前界面不兼容。	言語パックは現在の画面と互換性がありません。
+invalid_template	The vehicle template is invalid.	车型模板格式无效。	車種テンプレートの形式が無効です。
+job_changed	Another download replaced this operation. Check the current status.	当前下载任务已变化，请查看设备状态。	ダウンロード処理が変更されました。現在の状態をご確認ください。
+request_failed	The request failed. Please retry.	请求失败，请重试。	リクエストに失敗しました。再試行してください。
+resources.failureDetail	Source: {source}. Stage: {stage}. Code: {code}.	下载源：{source}；失败阶段：{stage}；代码：{code}。	取得元：{source}。失敗段階：{stage}。コード：{code}。
+resources.stage.tcp	TCP connection	TCP 连接	TCP 接続
+resources.stage.tls_setup	TLS initialization	TLS 初始化	TLS 初期化
+resources.stage.tls	TLS handshake / certificate verification	TLS 握手或证书校验	TLS ハンドシェイク／証明書検証
+resources.stage.request	HTTP request transmission	发送 HTTP 请求	HTTP リクエスト送信
+resources.stage.headers	HTTP response headers	读取 HTTP 响应头	HTTP 応答ヘッダーの受信
+resources.stage.http	HTTP status (code is the server status)	HTTP 状态（代码为服务器状态码）	HTTP ステータス（コードはサーバー応答）
+resources.stage.encoding	Unsupported response encoding	响应编码不受支持	未対応の応答エンコード
+resources.stage.body	File transfer interrupted	文件传输中断	ファイル転送の中断
+resources.stage.size	File size check	文件大小校验	ファイルサイズの検証
+resources.stage.hash	File integrity check	文件完整性校验	ファイル整合性の検証
+resources.stage.storage	Local storage	本地存储空间或写入	ローカルストレージ
+resources.stage.path	Resource path validation	资源路径校验	リソースパスの検証
+resources.updateTemplate	Update online	在线更新	オンライン更新
+resources.chooseTemplate	Choose a template	选择模板	テンプレートを選択
+resources.templateReady	Template ready. Choose the data to enable, then apply.	模板已准备好，勾选需要启用的数据后应用。	テンプレートを読み込みました。有効にするデータを選び、適用してください。
+resources.selectHelp	Select the data to query and publish. Unchecked items are retained and can be enabled later on the OBD page.	勾选需要读取和上报的数据。未勾选的项目会保留，可稍后在 OBD 页面启用。	取得・送信するデータを選択してください。未選択の項目も保存され、後で OBD ページから有効にできます。
+states.search	Find data by display name	按显示名称查找数据	表示名でデータを検索
+states.selectAll	Enable all	全部启用	すべて有効
+states.selectNone	Disable all	全部停用	すべて無効
+states.addCustom	Add custom PID	添加自定义 PID	カスタム PID を追加
+states.new	New PID	新建 PID	新しい PID
+states.needsAttention	Check settings	检查配置	設定を確認
+states.defaultRpm	Revolutions per minute	发动机转速	エンジン回転数
+states.defaultSoc	Battery SOC (OBD 015B)	电池剩余电量（OBD）	バッテリー残量（OBD）

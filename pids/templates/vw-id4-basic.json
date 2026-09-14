@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "vw-id4-basic",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "validation": "Four queries verified on one ID.4 with iCar Pro 2S; other model years and long-term stability require testing.",
   "states": [
     {
@@ -156,5 +156,10 @@
         "format": "%3.1f"
       }
     }
-  ]
+  ],
+  "title": {
+    "en": "Volkswagen ID.4 · four tested queries",
+    "zh-CN": "大众 ID.4 · 四项已验证数据",
+    "ja": "Volkswagen ID.4 · 検証済み4項目"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.2",
+  "version": "1.1.0",
   "uiSchemaVersion": 1,
   "fallback": "en",
   "integrationStatus": "integrated",
@@ -9,36 +9,36 @@
       "locale": "en",
       "name": "English",
       "path": "en.json",
-      "bytes": 15467,
-      "sha256": "6915f184d71f1c5e2bb1d092610c02edd1bda088cce05015a143f87f548ab9b9",
+      "bytes": 18242,
+      "sha256": "88285a6cdc22493a2181a12eac25d2851c424e4ad5e85ce8c1c31addaf516968",
       "gzip": {
         "path": "en.json.gz",
-        "bytes": 4834,
-        "sha256": "132f78b088910848fc28eb6a6daa3b7fd5ce477c061551772136034e632e9696"
+        "bytes": 5655,
+        "sha256": "7e9e2379fc1f0b66c3e27a84c2d65fdce66b0e12f31b1d345ccb465a1c87c1e8"
       }
     },
     {
       "locale": "zh-CN",
       "name": "简体中文",
       "path": "zh-CN.json",
-      "bytes": 15739,
-      "sha256": "60db72f3bc9432bf53fa9920879829c3f0aaf157a71187c11f5b3576b977da3c",
+      "bytes": 18342,
+      "sha256": "46892e30a2ac91d74f1cc3319d412e64b088866f5b202fcb5af83b8d95000f30",
       "gzip": {
         "path": "zh-CN.json.gz",
-        "bytes": 5656,
-        "sha256": "65eebf8541a917206f61dfd375c315316cdc4a78b7c6020bfa007583576e9184"
+        "bytes": 6514,
+        "sha256": "31ad4274d52a7785a26279b7074a087b842efdde251deaf4872a662565b7508c"
       }
     },
     {
       "locale": "ja",
       "name": "日本語",
       "path": "ja.json",
-      "bytes": 19678,
-      "sha256": "0d18fa3bdbfa0516d753a589e3033949b3165038bde627ebb91c7391d88e2423",
+      "bytes": 23145,
+      "sha256": "be348b78306ceef9c0b6e05cfc4ecb52cb23c806d546e993eb7955db2676ebec",
       "gzip": {
         "path": "ja.json.gz",
-        "bytes": 6187,
-        "sha256": "672cab3ad3d4881cf7253965329878cdfb08e845343d7ac9b80753263a647050"
+        "bytes": 7093,
+        "sha256": "6ec56ccb4f7bb0e9333422ab32cda12786f77170c208b723dae6451c673bfcb1"
       }
     }
   ]

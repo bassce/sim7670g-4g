@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "generic-petrol-basic",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "validation": "Standard OBD example; not verified on a petrol vehicle in this project.",
   "states": [
     {
@@ -89,5 +89,10 @@
         "format": "%d"
       }
     }
-  ]
+  ],
+  "title": {
+    "en": "Petrol · standard OBD",
+    "zh-CN": "燃油车 · 标准 OBD",
+    "ja": "ガソリン車 · 標準 OBD"
+  }
 }

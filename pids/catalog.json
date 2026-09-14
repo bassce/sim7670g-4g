@@ -4,23 +4,35 @@
     {
       "id": "generic-petrol-basic",
       "path": "templates/generic-petrol-basic.json",
-      "sha256": "15c2f0dbef4154e24a42ca4880ffc961d1f5605c323cca8a11401b3dbc6d9f78",
+      "sha256": "7a17fd9d5fc224d457896e95892b54ad0d10934ec9bc33d030cdc4e7de5e6d80",
       "importPath": "import/generic-petrol-basic.en.json",
-      "bytes": 2071,
+      "bytes": 2305,
       "localizedImportPaths": {
         "ja": "import/generic-petrol-basic.ja.json"
-      }
+      },
+      "title": {
+        "en": "Petrol · standard OBD",
+        "zh-CN": "燃油车 · 标准 OBD",
+        "ja": "ガソリン車 · 標準 OBD"
+      },
+      "version": "1.1.0"
     },
     {
       "id": "vw-id4-basic",
       "path": "templates/vw-id4-basic.json",
-      "sha256": "0f95db29198ed033f4bbaea2be71be4a330b23740a7465395ea19cde6561e50f",
+      "sha256": "ad71d37fbdd76757c6d8e4f8963b0dacfad7aa1bbb91de0e2f938b02da25b7ef",
       "importPath": "import/vw-id4-basic.en.json",
-      "bytes": 4016,
+      "bytes": 4355,
       "localizedImportPaths": {
         "ja": "import/vw-id4-basic.ja.json"
-      }
+      },
+      "title": {
+        "en": "Volkswagen ID.4 · four tested queries",
+        "zh-CN": "大众 ID.4 · 四项已验证数据",
+        "ja": "Volkswagen ID.4 · 検証済み4項目"
+      },
+      "version": "1.1.0"
     }
   ],
-  "version": "1.0.1"
+  "version": "1.1.0"
 }
